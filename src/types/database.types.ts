@@ -11,6 +11,8 @@ export type SchoolRole =
   | "parent"
   | "student";
 
+export type StudentGender = "male" | "female" | "other";
+
 export type Database = {
   public: {
     Tables: {
@@ -110,11 +112,68 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["academic_years"]["Insert"]>;
         Relationships: [];
       };
+      classes: {
+        Row: {
+          id: string;
+          school_id: string;
+          name: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          name: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["classes"]["Insert"]>;
+        Relationships: [];
+      };
+      students: {
+        Row: {
+          id: string;
+          school_id: string;
+          class_id: string | null;
+          admission_no: string | null;
+          full_name: string;
+          gender: StudentGender | null;
+          dob: string | null;
+          guardian_name: string | null;
+          guardian_phone: string | null;
+          guardian_email: string | null;
+          address: string | null;
+          admission_date: string;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          class_id?: string | null;
+          admission_no?: string | null;
+          full_name: string;
+          gender?: StudentGender | null;
+          dob?: string | null;
+          guardian_name?: string | null;
+          guardian_phone?: string | null;
+          guardian_email?: string | null;
+          address?: string | null;
+          admission_date?: string;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          deleted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["students"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
       school_role: SchoolRole;
+      student_gender: StudentGender;
     };
     CompositeTypes: Record<string, never>;
   };

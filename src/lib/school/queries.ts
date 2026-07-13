@@ -43,3 +43,20 @@ export async function getUserSchools(
     role: roleBySchoolId.get(school.id)!,
   }));
 }
+
+// RLS (schools_select: is_school_member OR created_by = auth.uid()) does the
+// authorization here — this simply returns null if the caller isn't
+// permitted to see the school, same as if it didn't exist.
+export async function getSchoolIdBySlug(
+  supabase: SupabaseClient<Database>,
+  slug: string
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("schools")
+    .select("id")
+    .eq("slug", slug)
+    .single();
+
+  if (error || !data) return null;
+  return data.id;
+}

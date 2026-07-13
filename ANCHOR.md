@@ -1,25 +1,30 @@
 ---
-progress: 45
+progress: 55
 status: In Progress
-next: User needs to create their first Supabase Auth login (Dashboard → Authentication → Users → Add user), then log in and create their first real school via /onboarding to test the full flow end-to-end. After that, Module 1 (Auth + School Management) is fully done — next is Dashboard → Student Management → Fee Collection.
+next: Build Student Management (Task 6) — student CRUD, class assignment, list with search/filter — then Fee Collection, pixel-matched to the user's reference mockup screens.
 goal: Ship Phase 1 of School OS — a multi-tenant school accounting SaaS (fees, expenses, salary, cash book, ledger, reports) for schools across India, starting with Module 1 (Auth + School Management)
 ---
 
-**Tech stack**: Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, Supabase (Postgres + Auth + Storage), deployed on Vercel.
+**Tech stack**: Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, Supabase (Postgres + Auth + Storage). Deployed on Vercel at https://school-os-blue.vercel.app.
 
-**Module 1 (Auth + School Management) is functionally complete:**
-- Auth: login, logout, forgot/reset password, session refresh via `src/proxy.ts` (this Next.js version renamed `middleware.ts` → `proxy.ts` — documented in AGENTS.md).
-- Schema live in Supabase: `schools`, `profiles`, `school_users`, `academic_years`, all RLS-protected. CLI `db push`/`migration repair` now work (connection string in `.env.local` as `SUPABASE_DB_URL`, server-only).
-- **School-scoped routing**: everything under `app/(dashboard)/[schoolSlug]/...`. Root `/` resolves the user's schools and redirects to their first one's `/​{slug}/dashboard`, or to `/onboarding` if they have none. The `[schoolSlug]/layout.tsx` verifies real membership (not just auth) before rendering, and feeds real user/school data into the shell.
-- **School switcher**: dropdown in the sidebar (desktop) and in the mobile "More" sheet, listing every school the user belongs to, plus "Add school" → `/onboarding`. Create-school flow (`features/schools/actions.ts`) handles slug generation/collisions and auto-adds the creator as `school_admin`.
-- **UI direction locked from a user-provided reference mockup** and matched closely, verified live: dark navy sidebar (fixed brand element, independent of light/dark mode), primary buttons in that same navy, colored icon-chip stat tiles (green/red/blue/orange/purple), breadcrumbs, real topbar (search input — chrome only, disabled — theme toggle that actually works via next-themes, notification bell with an honest "No notifications yet" empty state, avatar dropdown with real name/email/role + sign out). Reference implementation permanently viewable at `/style-guide` (public dev-only route, not linked in nav, remove before shipping).
-- Reusable components: `stat-card.tsx`, `breadcrumb.tsx`, `school-switcher.tsx`, `account-menu.tsx`, `topbar.tsx`, `theme-toggle.tsx`.
+**Module 1 (Auth + School Management) is DONE — verified live in production, not just locally:**
+- Repo: https://github.com/Volcano7887/-school-os (git initialized this session; excel files with real student names and the reference mockup image are gitignored — never committed, contain PII).
+- Deployed to Vercel, connected to GitHub for auto-deploy on push. Env vars set in Vercel dashboard.
+- User created their own login manually (Supabase dashboard → Authentication → Users — no public signup by design), logged in, created their first real school via `/onboarding`, and confirmed the full authenticated dashboard renders correctly (sidebar, school switcher, stat tiles, account menu) in production.
 
-**Explicitly deferred** (per user's own "100%" reference, but these need real data to not be fake decoration): actual working search results, real notifications, Cash Flow / Income-vs-Expense charts, and the Fee Collection / Add Expense / Reports / Student Profile screens from the reference — those get pixel-matched against the same reference when we build the Fee Collection, Expense Management, Reports, and Student Management modules, in that order, since their schema doesn't exist yet.
+**Two real bugs found and fixed post-deploy (both live now):**
+1. **Stale `/dashboard` redirects**: login, password reset, the auth callback default, and the "already logged in" middleware check all still pointed at the old flat `/dashboard` route from before the Task 5 `[schoolSlug]` restructure — caused a 404 right after login in production. Fixed by grepping for every hardcoded `/dashboard` and pointing them at `/` (the school-resolving root) instead.
+2. **RLS blocked reading back a just-created school**: `createSchool` inserts a school then immediately selects it back to get its id/slug — but the `schools_select` policy only allowed rows where the user is already a *member*, and the `school_users` row doesn't exist yet at that point in the same action. Fixed via a new migration allowing `created_by = auth.uid()` as an alternate select condition, applied directly via `supabase db push` (CLI is now fully working — see below).
 
-**Still open before Module 1 is 100% done:**
-1. User creates their own Supabase Auth login (dashboard → Authentication → Users → Add user, "Auto Confirm User" on) — no public signup by design.
-2. Also set Supabase Authentication → URL Configuration: Site URL `http://localhost:3000`, redirect URL `http://localhost:3000/auth/callback` (needed for password reset).
-3. Log in, create first real school via onboarding, confirm the whole flow end-to-end (currently only verified via the public `/style-guide` demo route, not a real authenticated session).
+**Supabase CLI is now fully functional**: connection string stored in `.env.local` as `SUPABASE_DB_URL` (server-only, gitignored). `supabase db push --db-url "$SUPABASE_DB_URL"` applies migrations directly — no more manual SQL Editor pasting needed for future modules.
 
-**Worth remembering:** user is a working school accountant building this as a real product, not a toy — feature/UX decisions should reflect real accounting workflows she knows firsthand, and she wants pixel-fidelity to her reference mockups, not simplified approximations. Full context in `.claude` memory (`user_role.md`, `project_scope.md`).
+**UI direction** (locked in from user's reference mockup, see prior notes): dark navy sidebar, colored icon-chip stat tiles, breadcrumbs, real topbar (working theme toggle, honest empty states for search/notifications pending real data). Reference implementation at `/style-guide` (public, dev-only, remove before real launch).
+
+**Still open / housekeeping:**
+- `/style-guide` route is public in production right now — fine for now (no real data exposed) but should be removed or auth-gated before any real launch.
+- Only one Vercel env var set so far was confirmed (`NEXT_PUBLIC_SITE_URL` etc.) — worth double-checking `NEXT_PUBLIC_SITE_URL` exactly matches `https://school-os-blue.vercel.app` for password-reset links in prod.
+- `database.types.ts` is still hand-written (Docker/Podman not installed, blocks real `supabase gen types`) — low priority, works fine as-is.
+
+**Next module: Student Management**, then **Fee Collection** — pixel-matched to the user's reference screens (search-by-student, collection form with running balance, receipt) since that's the module she'll actually use daily.
+
+**Worth remembering:** user is a working school accountant building this as a real product, not a toy — wants pixel-fidelity to her reference mockups, and moves fast/expects action over lengthy back-and-forth. Full context in `.claude` memory (`user_role.md`, `project_scope.md`).
