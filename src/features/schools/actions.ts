@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils/slugify";
 import { createSchoolSchema } from "@/features/schools/schema";
+import { DEFAULT_LEDGER_ACCOUNTS } from "@/lib/accounting/default-accounts";
 import type { ActionState } from "@/lib/types/action-state";
 
 const UNIQUE_VIOLATION = "23505";
@@ -77,6 +78,18 @@ export async function createSchool(
       message: "School was created, but adding you as its admin failed. Contact support.",
     };
   }
+
+  // Seed the default chart of accounts so Fee Collection can post journal
+  // entries from day one — not fatal if it fails, Fee Collection re-checks.
+  await supabase.from("ledger_accounts").insert(
+    DEFAULT_LEDGER_ACCOUNTS.map((account) => ({
+      school_id: school.id,
+      code: account.code,
+      name: account.name,
+      type: account.type,
+      is_system: true,
+    }))
+  );
 
   redirect(`/${school.slug}/dashboard`);
 }

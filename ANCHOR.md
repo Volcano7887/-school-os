@@ -1,7 +1,7 @@
 ---
 progress: 55
 status: In Progress
-next: Build Student Management (Task 6) — student CRUD, class assignment, list with search/filter — then Fee Collection, pixel-matched to the user's reference mockup screens.
+next: User needs to test Student Management live (create a class, add a student, search/filter, open student profile, edit). Then build Fee Collection, pixel-matched to the user's reference mockup screens.
 goal: Ship Phase 1 of School OS — a multi-tenant school accounting SaaS (fees, expenses, salary, cash book, ledger, reports) for schools across India, starting with Module 1 (Auth + School Management)
 ---
 
@@ -25,6 +25,8 @@ goal: Ship Phase 1 of School OS — a multi-tenant school accounting SaaS (fees,
 - Only one Vercel env var set so far was confirmed (`NEXT_PUBLIC_SITE_URL` etc.) — worth double-checking `NEXT_PUBLIC_SITE_URL` exactly matches `https://school-os-blue.vercel.app` for password-reset links in prod.
 - `database.types.ts` is still hand-written (Docker/Podman not installed, blocks real `supabase gen types`) — low priority, works fine as-is.
 
-**Next module: Student Management**, then **Fee Collection** — pixel-matched to the user's reference screens (search-by-student, collection form with running balance, receipt) since that's the module she'll actually use daily.
+**Student Management module shipped** (schema + list/search/filter + add/edit dialog + manage-classes dialog + profile page). Not yet verified live by the user — needs testing after this deploy. Classes are simple persistent grade levels (school_id, name), not tied to academic_year_id — matches how the user's real schools actually track them, avoids blocking on academic-year UI that doesn't exist yet.
+
+**Next module: Fee Collection** — pixel-matched to the user's reference screens (search-by-student, collection form with running balance, receipt) since that's the module she'll actually use daily. Will need: fee_structures, student_fee_invoices, fee_payments tables, plus the accounting core (chart of accounts + journal entries) from the original architecture doc, since Fee Collection posts real transactions.
 
 **Worth remembering:** user is a working school accountant building this as a real product, not a toy — wants pixel-fidelity to her reference mockups, and moves fast/expects action over lengthy back-and-forth. Full context in `.claude` memory (`user_role.md`, `project_scope.md`).

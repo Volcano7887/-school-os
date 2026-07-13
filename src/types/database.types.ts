@@ -12,6 +12,10 @@ export type SchoolRole =
   | "student";
 
 export type StudentGender = "male" | "female" | "other";
+export type AccountType = "asset" | "liability" | "income" | "expense" | "equity";
+export type JournalSourceType = "fee_payment" | "expense" | "salary_payment" | "manual";
+export type FeeType = "tuition" | "admission" | "exam" | "arrears";
+export type PaymentMode = "cash" | "bank" | "upi";
 
 export type Database = {
   public: {
@@ -168,12 +172,162 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["students"]["Insert"]>;
         Relationships: [];
       };
+      ledger_accounts: {
+        Row: {
+          id: string;
+          school_id: string;
+          code: string;
+          name: string;
+          type: AccountType;
+          is_system: boolean;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          code: string;
+          name: string;
+          type: AccountType;
+          is_system?: boolean;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ledger_accounts"]["Insert"]>;
+        Relationships: [];
+      };
+      journal_entries: {
+        Row: {
+          id: string;
+          school_id: string;
+          entry_date: string;
+          narration: string | null;
+          source_type: JournalSourceType;
+          source_id: string | null;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          entry_date: string;
+          narration?: string | null;
+          source_type: JournalSourceType;
+          source_id?: string | null;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["journal_entries"]["Insert"]>;
+        Relationships: [];
+      };
+      journal_entry_lines: {
+        Row: {
+          id: string;
+          journal_entry_id: string;
+          ledger_account_id: string;
+          debit_amount: number;
+          credit_amount: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          journal_entry_id: string;
+          ledger_account_id: string;
+          debit_amount?: number;
+          credit_amount?: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["journal_entry_lines"]["Insert"]>;
+        Relationships: [];
+      };
+      fee_structures: {
+        Row: {
+          id: string;
+          school_id: string;
+          academic_year_id: string;
+          class_id: string | null;
+          fee_type: FeeType;
+          name: string;
+          amount: number;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          academic_year_id: string;
+          class_id?: string | null;
+          fee_type: FeeType;
+          name: string;
+          amount: number;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["fee_structures"]["Insert"]>;
+        Relationships: [];
+      };
+      fee_payments: {
+        Row: {
+          id: string;
+          school_id: string;
+          student_id: string;
+          fee_structure_id: string | null;
+          academic_year_id: string;
+          receipt_no: string;
+          amount: number;
+          payment_mode: PaymentMode;
+          period_label: string | null;
+          remarks: string | null;
+          paid_at: string;
+          recorded_by: string;
+          journal_entry_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          student_id: string;
+          fee_structure_id?: string | null;
+          academic_year_id: string;
+          receipt_no: string;
+          amount: number;
+          payment_mode: PaymentMode;
+          period_label?: string | null;
+          remarks?: string | null;
+          paid_at?: string;
+          recorded_by: string;
+          journal_entry_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["fee_payments"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      record_fee_payment: {
+        Args: {
+          p_school_id: string;
+          p_student_id: string;
+          p_academic_year_id: string;
+          p_fee_type: FeeType;
+          p_amount: number;
+          p_payment_mode: PaymentMode;
+          p_paid_at: string;
+          p_period_label: string | null;
+          p_remarks: string | null;
+          p_recorded_by: string;
+        };
+        Returns: Database["public"]["Tables"]["fee_payments"]["Row"];
+      };
+    };
     Enums: {
       school_role: SchoolRole;
       student_gender: StudentGender;
+      account_type: AccountType;
+      journal_source_type: JournalSourceType;
+      fee_type: FeeType;
+      payment_mode: PaymentMode;
     };
     CompositeTypes: Record<string, never>;
   };

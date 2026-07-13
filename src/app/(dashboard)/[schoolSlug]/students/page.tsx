@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { StudentFormDialog } from "./student-form-dialog";
 import { ManageClassesDialog } from "./manage-classes-dialog";
-import { FilterBar } from "./filter-bar";
+import { FilterBar } from "@/components/shared/filter-bar";
 
 export default async function StudentsPage({
   params,

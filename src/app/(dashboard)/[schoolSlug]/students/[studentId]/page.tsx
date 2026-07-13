@@ -3,11 +3,27 @@ import { Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getClasses, getStudent } from "@/lib/students/queries";
+import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
+import { getStudentPayments } from "@/lib/fees/queries";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { StudentFormDialog } from "../student-form-dialog";
+
+const PAYMENT_MODE_LABEL: Record<string, string> = {
+  cash: "Cash",
+  bank: "Bank",
+  upi: "UPI",
+};
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -34,14 +50,18 @@ export default async function StudentProfilePage({
   const schoolId = await getSchoolIdBySlug(supabase, schoolSlug);
   if (!schoolId) return null;
 
-  const [student, classes] = await Promise.all([
+  const [student, classes, academicYear] = await Promise.all([
     getStudent(supabase, schoolId, studentId),
     getClasses(supabase, schoolId),
+    getCurrentAcademicYear(supabase, schoolId),
   ]);
 
   if (!student) notFound();
 
   const className = classes.find((c) => c.id === student.class_id)?.name;
+  const payments = academicYear
+    ? await getStudentPayments(supabase, schoolId, studentId, academicYear.id)
+    : [];
 
   return (
     <div className="space-y-4">
@@ -81,11 +101,6 @@ export default async function StudentProfilePage({
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Fee history and payment details land here once the Fee Collection
-        module is built.
-      </p>
-
       <Card>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -120,6 +135,44 @@ export default async function StudentProfilePage({
           </div>
         </CardContent>
       </Card>
+
+      <div>
+        <h2 className="mb-2 text-lg font-semibold">Payment History</h2>
+        {!academicYear ? (
+          <p className="text-sm text-muted-foreground">
+            No academic year set up yet — visit Fee Collection first.
+          </p>
+        ) : payments.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No payments recorded yet for {academicYear.name}.
+          </p>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Receipt No.</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Mode</TableHead>
+                  <TableHead>Remarks</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell>{formatDate(p.paidAt)}</TableCell>
+                    <TableCell className="font-medium">{p.receiptNo}</TableCell>
+                    <TableCell>₹{(p.amount / 100).toLocaleString("en-IN")}</TableCell>
+                    <TableCell>{PAYMENT_MODE_LABEL[p.paymentMode]}</TableCell>
+                    <TableCell>{p.remarks ?? p.periodLabel ?? "—"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
