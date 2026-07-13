@@ -302,9 +302,98 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["fee_payments"]["Insert"]>;
         Relationships: [];
       };
+      expense_categories: {
+        Row: {
+          id: string;
+          school_id: string;
+          name: string;
+          ledger_account_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          name: string;
+          ledger_account_id: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["expense_categories"]["Insert"]>;
+        Relationships: [];
+      };
+      vendors: {
+        Row: {
+          id: string;
+          school_id: string;
+          name: string;
+          phone: string | null;
+          email: string | null;
+          address: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          name: string;
+          phone?: string | null;
+          email?: string | null;
+          address?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["vendors"]["Insert"]>;
+        Relationships: [];
+      };
+      expenses: {
+        Row: {
+          id: string;
+          school_id: string;
+          expense_category_id: string;
+          vendor_id: string | null;
+          amount: number;
+          payment_mode: PaymentMode;
+          expense_date: string;
+          bill_no: string | null;
+          remarks: string | null;
+          bill_attachment_path: string | null;
+          recorded_by: string;
+          journal_entry_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          expense_category_id: string;
+          vendor_id?: string | null;
+          amount: number;
+          payment_mode: PaymentMode;
+          expense_date?: string;
+          bill_no?: string | null;
+          remarks?: string | null;
+          bill_attachment_path?: string | null;
+          recorded_by: string;
+          journal_entry_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["expenses"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      record_expense: {
+        Args: {
+          p_school_id: string;
+          p_expense_category_id: string;
+          p_vendor_id: string | null;
+          p_amount: number;
+          p_payment_mode: PaymentMode;
+          p_expense_date: string;
+          p_bill_no: string | null;
+          p_remarks: string | null;
+          p_bill_attachment_path: string | null;
+          p_recorded_by: string;
+        };
+        Returns: Database["public"]["Tables"]["expenses"]["Row"];
+      };
       record_fee_payment: {
         Args: {
           p_school_id: string;
