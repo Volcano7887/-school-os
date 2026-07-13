@@ -44,3 +44,6 @@ next-env.d.ts
 # not project source. Never commit these.
 /excel files demo/
 /UI pages/
+
+# supabase CLI internal cache
+supabase/.temp/
