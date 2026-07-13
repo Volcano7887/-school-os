@@ -74,8 +74,12 @@ export function RecordPaymentDialog({
             <p className="font-semibold">₹{(student.totalPaid / 100).toLocaleString("en-IN")}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Balance</p>
-            <p className="font-semibold">₹{(student.balance / 100).toLocaleString("en-IN")}</p>
+            <p className="text-xs text-muted-foreground">
+              {student.balance < 0 ? "Advance" : "Balance"}
+            </p>
+            <p className="font-semibold">
+              ₹{(Math.abs(student.balance) / 100).toLocaleString("en-IN")}
+            </p>
           </div>
         </div>
 

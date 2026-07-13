@@ -23,9 +23,23 @@ function inr(paise: number) {
   return `₹${(paise / 100).toLocaleString("en-IN")}`;
 }
 
+// A negative balance means the student has paid more than what's currently
+// due (often because payments were recorded before a fee structure existed)
+// — showing that as a plain negative number reads like an error, so we
+// label it as an advance/credit instead.
+function formatBalance(balance: number) {
+  if (balance < 0) return `${inr(Math.abs(balance))} advance`;
+  return inr(balance);
+}
+
 function statusFor(totalDue: number, totalPaid: number, balance: number) {
+  if (balance < 0)
+    return {
+      label: "Advance",
+      className: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
+    };
   if (totalDue === 0) return { label: "No dues", className: "bg-muted text-muted-foreground" };
-  if (balance <= 0)
+  if (balance === 0)
     return {
       label: "Paid",
       className: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400",
@@ -137,7 +151,7 @@ export default async function FeesPage({
                       <TableCell>{s.className ?? "—"}</TableCell>
                       <TableCell>{inr(s.totalDue)}</TableCell>
                       <TableCell>{inr(s.totalPaid)}</TableCell>
-                      <TableCell>{inr(s.balance)}</TableCell>
+                      <TableCell>{formatBalance(s.balance)}</TableCell>
                       <TableCell>
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
