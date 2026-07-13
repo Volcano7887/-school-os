@@ -46,7 +46,9 @@ export async function updateSession(request: NextRequest) {
 
   if (user && (pathname === "/login" || pathname === "/forgot-password")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    // "/" resolves to the user's actual active school — there's no flat
+    // "/dashboard" route anymore since routing moved to /{schoolSlug}/....
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 

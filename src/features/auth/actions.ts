@@ -32,7 +32,9 @@ export async function login(
     return { status: "error", message: "Incorrect email or password." };
   }
 
-  redirect("/dashboard");
+  // "/" resolves to the user's actual active school — there's no flat
+  // "/dashboard" route anymore since routing moved to /{schoolSlug}/....
+  redirect("/");
 }
 
 export async function logout() {
@@ -99,5 +101,5 @@ export async function resetPassword(
     };
   }
 
-  redirect("/dashboard");
+  redirect("/");
 }

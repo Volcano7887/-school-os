@@ -93,7 +93,7 @@ export default function StyleGuidePage() {
         <h2 className="text-lg font-semibold">2. Breadcrumb</h2>
         <Breadcrumb
           items={[
-            { label: "Dashboard", href: "/dashboard" },
+            { label: "Dashboard", href: "/demo/dashboard" },
             { label: "Fee Collection" },
           ]}
         />
