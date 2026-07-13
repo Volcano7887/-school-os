@@ -376,9 +376,76 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["expenses"]["Insert"]>;
         Relationships: [];
       };
+      staff: {
+        Row: {
+          id: string;
+          school_id: string;
+          full_name: string;
+          designation: string | null;
+          phone: string | null;
+          monthly_salary: number;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          full_name: string;
+          designation?: string | null;
+          phone?: string | null;
+          monthly_salary: number;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["staff"]["Insert"]>;
+        Relationships: [];
+      };
+      salary_payments: {
+        Row: {
+          id: string;
+          school_id: string;
+          staff_id: string;
+          amount: number;
+          payment_mode: PaymentMode;
+          pay_month: string;
+          paid_at: string;
+          remarks: string | null;
+          recorded_by: string;
+          journal_entry_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          staff_id: string;
+          amount: number;
+          payment_mode: PaymentMode;
+          pay_month: string;
+          paid_at?: string;
+          remarks?: string | null;
+          recorded_by: string;
+          journal_entry_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["salary_payments"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      record_salary_payment: {
+        Args: {
+          p_school_id: string;
+          p_staff_id: string;
+          p_amount: number;
+          p_payment_mode: PaymentMode;
+          p_pay_month: string;
+          p_paid_at: string;
+          p_remarks: string | null;
+          p_recorded_by: string;
+        };
+        Returns: Database["public"]["Tables"]["salary_payments"]["Row"];
+      };
       record_expense: {
         Args: {
           p_school_id: string;
