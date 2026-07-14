@@ -60,3 +60,34 @@ export async function getSchoolIdBySlug(
   if (error || !data) return null;
   return data.id;
 }
+
+export type SchoolProfile = {
+  id: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  academicYearStartMonth: number;
+};
+
+export async function getSchoolProfile(
+  supabase: SupabaseClient<Database>,
+  schoolId: string
+): Promise<SchoolProfile | null> {
+  const { data, error } = await supabase
+    .from("schools")
+    .select("id, name, address, phone, email, academic_year_start_month")
+    .eq("id", schoolId)
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    id: data.id,
+    name: data.name,
+    address: data.address,
+    phone: data.phone,
+    email: data.email,
+    academicYearStartMonth: data.academic_year_start_month,
+  };
+}

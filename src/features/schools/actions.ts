@@ -1,9 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { slugify } from "@/lib/utils/slugify";
-import { createSchoolSchema } from "@/features/schools/schema";
+import { createSchoolSchema, updateSchoolSchema } from "@/features/schools/schema";
 import { DEFAULT_LEDGER_ACCOUNTS } from "@/lib/accounting/default-accounts";
 import type { ActionState } from "@/lib/types/action-state";
 
@@ -92,4 +94,47 @@ export async function createSchool(
   );
 
   redirect(`/${school.slug}/dashboard`);
+}
+
+export async function updateSchool(
+  schoolSlug: string,
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = updateSchoolSchema.safeParse({
+    name: formData.get("name"),
+    address: formData.get("address") || undefined,
+    phone: formData.get("phone") || undefined,
+    email: formData.get("email") || undefined,
+    academicYearStartMonth: formData.get("academicYearStartMonth"),
+  });
+
+  if (!parsed.success) {
+    return { status: "error", fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const supabase = await createClient();
+  const schoolId = await getSchoolIdBySlug(supabase, schoolSlug);
+  if (!schoolId) return { status: "error", message: "School not found." };
+
+  const { error } = await supabase
+    .from("schools")
+    .update({
+      name: parsed.data.name,
+      address: parsed.data.address || null,
+      phone: parsed.data.phone || null,
+      email: parsed.data.email || null,
+      academic_year_start_month: parsed.data.academicYearStartMonth,
+    })
+    .eq("id", schoolId);
+
+  if (error) {
+    return {
+      status: "error",
+      message: "Couldn't save changes — only a school admin can edit this.",
+    };
+  }
+
+  revalidatePath(`/${schoolSlug}/settings`);
+  return { status: "success" };
 }

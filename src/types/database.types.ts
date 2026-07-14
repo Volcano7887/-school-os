@@ -16,6 +16,7 @@ export type AccountType = "asset" | "liability" | "income" | "expense" | "equity
 export type JournalSourceType = "fee_payment" | "expense" | "salary_payment" | "manual";
 export type FeeType = "tuition" | "admission" | "exam" | "arrears";
 export type PaymentMode = "cash" | "bank" | "upi";
+export type AuditAction = "create" | "update" | "delete";
 
 export type Database = {
   public: {
@@ -428,6 +429,32 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["salary_payments"]["Insert"]>;
+        Relationships: [];
+      };
+      audit_logs: {
+        Row: {
+          id: string;
+          school_id: string;
+          user_id: string;
+          action: AuditAction;
+          table_name: string;
+          record_id: string;
+          new_data: Record<string, unknown> | null;
+          old_data: Record<string, unknown> | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          user_id: string;
+          action: AuditAction;
+          table_name: string;
+          record_id: string;
+          new_data?: Record<string, unknown> | null;
+          old_data?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["audit_logs"]["Insert"]>;
         Relationships: [];
       };
     };
