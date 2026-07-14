@@ -1,6 +1,7 @@
 import { SidebarNav } from "@/components/shared/sidebar-nav";
 import { BottomNav } from "@/components/shared/bottom-nav";
 import { Topbar } from "@/components/shared/topbar";
+import { CommandPalette } from "@/components/shared/command-palette";
 import type { UserSchool } from "@/lib/school/queries";
 
 export function AppShell({
@@ -34,6 +35,7 @@ export function AppShell({
         </main>
       </div>
       <BottomNav schools={schools} activeSlug={activeSlug} />
+      <CommandPalette schoolSlug={activeSlug} />
     </div>
   );
 }
