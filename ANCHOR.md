@@ -1,38 +1,33 @@
 ---
-progress: 96
+progress: 97
 status: In Progress
-next: User said UI "looks shit" vs reference mockups and wants everything matched — worked through Dashboard/Students/Reports gaps in a batch (see below), user needs to test this batch live. ONE deliberately-deferred item remains: converting the Fee Collection dialog into a dedicated full page (matching reference exactly) — flagged as the highest-risk change since the dialog flow is already tested/working, so it's being done last and carefully, not bundled into this batch.
+next: User needs to live-test the Fee Collection page conversion (dialog -> full page) especially carefully, since it's the biggest structural change this session and retired a previously-working, tested component. Test: search finds students by name/admission no./phone, clicking a search result or a "Collect" row button opens the same inline panel, Save Collection / Save & Print Receipt both still work, Cancel clears the selection. Also still need to test the rest of this session's UI-matching batch (Dashboard panels, Students list, Reports charts).
 goal: Ship Phase 1 of School OS — a multi-tenant school accounting SaaS (fees, expenses, salary, cash book, ledger, reports) for schools across India, starting with Module 1 (Auth + School Management)
 ---
 
 **Tech stack**: Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, Supabase (Postgres + Auth + Storage). Deployed on Vercel at https://school-os-blue.vercel.app, repo at https://github.com/Volcano7887/-school-os.
 
-**Every module from the original Phase 1 list has a real, working page.** `npm run build` runs before every push now (a real Vercel 404 earlier turned out to be exactly the kind of thing `tsc`+`eslint` alone miss) — that discipline held through this whole session's large batch of changes with zero build failures.
+**Every module from the original Phase 1 list has a real, working page.** `npm run build` runs before every push (a real Vercel 404 earlier turned out to be exactly the kind of thing `tsc`+`eslint` alone miss) — held through this session's entire large UI-matching batch with zero build failures.
 
-**Confirmed working live (user tested):** Auth, School Management, Student Management, Fee Collection, Expense Management, Salary Management, Cash Book, Ledger.
+**Confirmed working live (user tested):** Auth, School Management, Student Management, Expense Management, Salary Management, Cash Book, Ledger. Fee Collection was confirmed working in its *dialog* form earlier in the session — it has since been restructured into a full page (see below) and needs re-testing.
 
-**Shipped, NOT yet tested live:** Dashboard, Reports, Bills, Audit Log, Settings, and this session's whole UI-matching batch (see below).
+**UI-matching pass — complete, all 4 items** (user said the UI "looks shit" vs. the reference mockups and wanted everything matched; this was a real, substantive gap, not just taste):
+1. **Dashboard**: Cash Flow line chart (CVD-validated) + Recent Transactions, plus a second row — Upcoming Fee Due + Recent Expenses — matching the reference's 2x2 panel layout.
+2. **Students list**: avatar circles, inline color-coded Due amount, an "All Status" (Due/Clear) filter.
+3. **Reports**: quick-report shortcut cards (real navigation, not fabricated report engines), a daily Income vs Expense bar chart, a Top Expense Categories donut (6-color categorical palette, took 3 iterations through the dataviz skill's CVD validator), a real CSV export.
+4. **Fee Collection — converted from dialog to dedicated full page**, the biggest and riskiest change: search-first entry point (name/admission no./phone, live suggestions) → same split-panel Collection Details + live Summary as before, now inline instead of modal. Kept the full browse-all-students table below (not in the reference, but real value) — both the search and the table's "Collect" button feed the same single collection panel. `record-payment-dialog.tsx` retired entirely, replaced by `fee-collection-panel.tsx` + `fee-collection-workspace.tsx`.
+5. **Add Expense** (done earlier in the batch): real image thumbnail preview of the uploaded bill.
 
-**UI-matching pass against the user's reference mockups** (user said the UI "looks shit" compared to the reference and wanted everything matched — this was a real, substantive gap, not just taste):
-1. **Dashboard**: Cash Flow line chart (6mo, CVD-validated), Recent Transactions feed, plus a second row — **Upcoming Fee Due** (top students by balance, links to their profile) and **Recent Expenses** — matching the reference's 2x2 panel layout exactly.
-2. **Add Expense**: real image thumbnail preview of the uploaded bill (object URL, properly revoked).
-3. **Fee Collection dialog**: redesigned to split-panel (student info + Total Due on left, Collection Details + live-recalculating Summary on right), added a real "Save & Print Receipt" action.
-4. **Students list**: avatar circles, inline color-coded Due amount (computed the same way as Fee Collection), and an "All Status" (Due/Clear) filter alongside the class filter.
-5. **Reports**: 4 quick-report shortcut cards (real navigation to relevant sections, not fabricated separate report engines), a daily Income vs Expense bar chart for the current month, a Top Expense Categories donut chart with legend+percentages (6-color categorical palette, took 3 iterations through the dataviz skill's CVD validator to pass), and a real "Export Report" CSV download.
-
-**Deliberately deferred, not forgotten**: converting Fee Collection from a dialog to the reference's dedicated full-page layout (search-first, single-student focus). This is the biggest remaining structural gap and the highest regression risk (the dialog flow is tested and confirmed working), so it's being done as its own careful pass rather than rushed into this batch.
-
-**Also shipped this session (before the UI-matching batch)**: printable fee receipts, WhatsApp click-to-send for receipts and fee reminders (English/Hindi/Hinglish) — zero-cost, chosen deliberately over SMS/WhatsApp-API after explaining the real setup/cost tradeoffs to the user.
+**Also shipped this session (before the UI-matching batch)**: printable fee receipts, WhatsApp click-to-send for receipts and fee reminders (English/Hindi/Hinglish) — zero-cost, chosen deliberately over SMS/WhatsApp-API after explaining real setup/cost tradeoffs to the user; real Boys-school Excel data import (72 students, real tuition amounts, 13 real historical transactions as balanced journal entries); Bills, Audit Log, Settings modules.
 
 **Accounting core**: chart of accounts + double-entry journal; `record_fee_payment`, `record_expense`, `record_salary_payment` all post atomically via SECURITY DEFINER Postgres functions and write an audit log row in the same transaction.
-
-**Real test data**: 72 real students imported from the user's actual Boys school Excel, real per-class tuition amounts, 13 real historical transactions reconstructed as balanced journal entries.
 
 **Known simplifications (deliberate):**
 - No academic-year switcher UI — only ever shows the current year.
 - `/style-guide` route still public — remove/gate before real launch.
-- `database.types.ts` still hand-written (Docker/Podman not installed) — now covers 15 tables + 3 RPC functions; worth revisiting Docker install soon.
-- Parent notifications are manual-send (click-to-send WhatsApp links), not automatic — deliberate cost/complexity tradeoff.
-- Reports' 4 "quick report" shortcuts are real navigation, not 4 distinct report engines — building fake distinct reports would have been worse than being upfront about this.
+- `database.types.ts` still hand-written (Docker/Podman not installed) — now covers 15 tables + 3 RPC functions; worth revisiting Docker install soon, it's getting large.
+- Parent notifications are manual-send (click-to-send WhatsApp links), not automatic.
+- Reports' quick-report shortcuts are real navigation, not 4 distinct report engines.
+- Fee Collection's browse-all-students table isn't in the reference mockup — kept anyway since browsing everyone's dues is real accounting value, reference was single-student-search-only.
 
-**Worth remembering:** user is a working school accountant building this as a real product — wants pixel-fidelity to her reference mockups, and pushed back hard when a batch of work didn't close the gap enough ("UI looks shit" x2) — take reference-matching literally and thoroughly, not just the obviously-easy pieces. Also explicit about wanting zero-cost solutions (rejected Firebase/SMS/WhatsApp-API for parent messaging once real tradeoffs were explained). Moves fast, expects action over lengthy back-and-forth. Full context in `.claude` memory (`user_role.md`, `project_scope.md`).
+**Worth remembering:** user is a working school accountant building this as a real product — wants pixel-fidelity to her reference mockups, and pushed back hard when a batch of work didn't close the gap enough ("UI looks shit" x2) — take reference-matching literally and thoroughly. Also explicit about wanting zero-cost solutions (rejected Firebase/SMS/WhatsApp-API once real tradeoffs were explained). Moves fast, expects action over lengthy back-and-forth. Full context in `.claude` memory (`user_role.md`, `project_scope.md`).
