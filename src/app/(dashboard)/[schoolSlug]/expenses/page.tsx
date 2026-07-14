@@ -1,34 +1,13 @@
-import { Receipt, Paperclip, Plus } from "lucide-react";
+import { Receipt, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getExpenseCategories, getVendors, getExpenses } from "@/lib/expenses/queries";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ManageCategoriesDialog } from "./manage-categories-dialog";
 import { ManageVendorsDialog } from "./manage-vendors-dialog";
 import { ExpenseFormDialog } from "./expense-form-dialog";
-
-const PAYMENT_MODE_LABEL: Record<string, string> = {
-  cash: "Cash",
-  bank: "Bank",
-  upi: "UPI",
-};
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
+import { ExpenseCards } from "./expense-cards";
 
 export default async function ExpensesPage({
   params,
@@ -102,57 +81,7 @@ export default async function ExpensesPage({
           </p>
         </div>
       ) : (
-        <>
-          <div className="hidden overflow-x-auto rounded-lg border sm:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Mode</TableHead>
-                  <TableHead>Bill No.</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {expenses.map((e) => (
-                  <TableRow key={e.id}>
-                    <TableCell>{formatDate(e.expenseDate)}</TableCell>
-                    <TableCell className="font-medium">{e.categoryName}</TableCell>
-                    <TableCell>{e.vendorName ?? "—"}</TableCell>
-                    <TableCell>₹{(e.amount / 100).toLocaleString("en-IN")}</TableCell>
-                    <TableCell>{PAYMENT_MODE_LABEL[e.paymentMode]}</TableCell>
-                    <TableCell>{e.billNo ?? "—"}</TableCell>
-                    <TableCell>
-                      {e.hasAttachment && (
-                        <Paperclip className="size-4 text-muted-foreground" />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="space-y-2 sm:hidden">
-            {expenses.map((e) => (
-              <div key={e.id} className="rounded-lg border p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{e.categoryName}</span>
-                  <span>₹{(e.amount / 100).toLocaleString("en-IN")}</span>
-                </div>
-                <div className="mt-1 flex justify-between text-sm text-muted-foreground">
-                  <span>{formatDate(e.expenseDate)}</span>
-                  <span>
-                    {e.vendorName ?? "No vendor"} · {PAYMENT_MODE_LABEL[e.paymentMode]}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+        <ExpenseCards schoolSlug={schoolSlug} expenses={expenses} />
       )}
     </div>
   );

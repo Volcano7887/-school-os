@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MoreHorizontal, LogOut, Check } from "lucide-react";
+import { MoreHorizontal, LogOut, Check, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS, MOBILE_PRIMARY_COUNT } from "@/components/shared/nav-items";
 import { logout } from "@/features/auth/actions";
@@ -28,10 +28,41 @@ export function BottomNav({
   const isMoreActive = moreItems.some((item) =>
     pathname.startsWith(`/${activeSlug}${item.href}`)
   );
+  const leftItems = primaryItems.slice(0, 2);
+  const rightItems = primaryItems.slice(2, 4);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 flex border-t bg-background/95 backdrop-blur md:hidden [padding-bottom:env(safe-area-inset-bottom)]">
-      {primaryItems.map((item) => {
+    <nav className="fixed inset-x-0 bottom-0 z-50 flex items-stretch border-t bg-background/95 backdrop-blur md:hidden [padding-bottom:env(safe-area-inset-bottom)]">
+      {leftItems.map((item) => {
+        const href = `/${activeSlug}${item.href}`;
+        const active = pathname.startsWith(href);
+        return (
+          <Link
+            key={item.href}
+            href={href}
+            className={cn(
+              "flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
+              active ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            <item.icon className="size-5" />
+            {item.label}
+          </Link>
+        );
+      })}
+
+      <div className="flex flex-1 items-center justify-center">
+        <button
+          type="button"
+          aria-label="Quick actions"
+          onClick={() => window.dispatchEvent(new Event("school-os:open-command-palette"))}
+          className="-mt-6 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+        >
+          <Plus className="size-6" />
+        </button>
+      </div>
+
+      {rightItems.map((item) => {
         const href = `/${activeSlug}${item.href}`;
         const active = pathname.startsWith(href);
         return (

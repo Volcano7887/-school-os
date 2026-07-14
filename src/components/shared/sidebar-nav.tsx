@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "@/components/shared/nav-items";
+import { NAV_GROUPS } from "@/components/shared/nav-items";
 import { SchoolSwitcher } from "@/components/shared/school-switcher";
 import { AccountMenu } from "@/components/shared/account-menu";
 import type { UserSchool } from "@/lib/school/queries";
@@ -33,26 +33,33 @@ export function SidebarNav({
       <div className="border-b border-sidebar-border p-2">
         <SchoolSwitcher schools={schools} activeSlug={activeSlug} />
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto p-2">
-        {NAV_ITEMS.map((item) => {
-          const href = `/${activeSlug}${item.href}`;
-          const active = pathname.startsWith(href);
-          return (
-            <Link
-              key={item.href}
-              href={href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              <item.icon className="size-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-4 overflow-y-auto p-2">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label} className="space-y-1">
+            <p className="px-3 text-[11px] font-semibold tracking-wide text-sidebar-foreground/40 uppercase">
+              {group.label}
+            </p>
+            {group.items.map((item) => {
+              const href = `/${activeSlug}${item.href}`;
+              const active = pathname.startsWith(href);
+              return (
+                <Link
+                  key={item.href}
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  <item.icon className="size-4 shrink-0" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
       <div className="border-t border-sidebar-border p-2">
         <AccountMenu name={userName} email={userEmail} role={userRole} showLabel />

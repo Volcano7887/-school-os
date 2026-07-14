@@ -57,6 +57,62 @@ export async function getDashboardStats(
   return { todayCollection, todayExpenses, cashInHand, pendingFees, pendingSalaries };
 }
 
+export type DailyTrend = {
+  collection: number[];
+  expenses: number[];
+  yesterdayCollection: number;
+  yesterdayExpenses: number;
+};
+
+export async function getDailyTrend(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  days = 7
+): Promise<DailyTrend> {
+  const cursor = new Date();
+  cursor.setDate(cursor.getDate() - (days - 1));
+  const sinceIso = cursor.toISOString().slice(0, 10);
+
+  const [{ data: payments }, { data: expenseRows }] = await Promise.all([
+    supabase
+      .from("fee_payments")
+      .select("amount, paid_at")
+      .eq("school_id", schoolId)
+      .gte("paid_at", sinceIso),
+    supabase
+      .from("expenses")
+      .select("amount, expense_date")
+      .eq("school_id", schoolId)
+      .gte("expense_date", sinceIso),
+  ]);
+
+  const dayKeys: string[] = [];
+  const walker = new Date();
+  walker.setDate(walker.getDate() - (days - 1));
+  for (let i = 0; i < days; i++) {
+    dayKeys.push(walker.toISOString().slice(0, 10));
+    walker.setDate(walker.getDate() + 1);
+  }
+
+  const collectionByDay = new Map<string, number>();
+  for (const p of payments ?? []) {
+    collectionByDay.set(p.paid_at, (collectionByDay.get(p.paid_at) ?? 0) + p.amount);
+  }
+  const expenseByDay = new Map<string, number>();
+  for (const e of expenseRows ?? []) {
+    expenseByDay.set(e.expense_date, (expenseByDay.get(e.expense_date) ?? 0) + e.amount);
+  }
+
+  const yesterdayKey = dayKeys[dayKeys.length - 2] ?? dayKeys[0];
+
+  return {
+    collection: dayKeys.map((d) => collectionByDay.get(d) ?? 0),
+    expenses: dayKeys.map((d) => expenseByDay.get(d) ?? 0),
+    yesterdayCollection: collectionByDay.get(yesterdayKey) ?? 0,
+    yesterdayExpenses: expenseByDay.get(yesterdayKey) ?? 0,
+  };
+}
+
 export type MonthlyIncomeExpense = {
   month: string; // "Jan 2026"
   income: number;

@@ -8,6 +8,7 @@ import {
   getRecentTransactions,
   getUpcomingFeeDue,
   getRecentExpensesList,
+  getDailyTrend,
 } from "@/lib/dashboard/queries";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { StatCard } from "@/components/shared/stat-card";
@@ -22,6 +23,19 @@ function inr(paise: number) {
   return `₹${(paise / 100).toLocaleString("en-IN")}`;
 }
 
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function deltaPercent(today: number, yesterday: number): number | undefined {
+  if (today === 0 && yesterday === 0) return undefined;
+  if (yesterday === 0) return 100;
+  return ((today - yesterday) / yesterday) * 100;
+}
+
 export default async function DashboardPage({
   params,
 }: {
@@ -32,21 +46,32 @@ export default async function DashboardPage({
   const schoolId = await getSchoolIdBySlug(supabase, schoolSlug);
   if (!schoolId) return null;
 
-  const [stats, chartData, recentTransactions, upcomingFeeDue, recentExpenses] =
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: profile } = user
+    ? await supabase.from("profiles").select("full_name").eq("id", user.id).single()
+    : { data: null };
+  const firstName = (profile?.full_name ?? "").split(" ")[0] || "there";
+
+  const [stats, chartData, recentTransactions, upcomingFeeDue, recentExpenses, trend] =
     await Promise.all([
       getDashboardStats(supabase, schoolId),
       getMonthlyIncomeExpense(supabase, schoolId),
       getRecentTransactions(supabase, schoolId),
       getUpcomingFeeDue(supabase, schoolId),
       getRecentExpensesList(supabase, schoolId),
+      getDailyTrend(supabase, schoolId),
     ]);
 
   return (
     <div className="space-y-4">
       <Breadcrumb items={[{ label: "Dashboard" }]} />
       <div>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Overview</p>
+        <h1 className="text-xl font-semibold">
+          {greeting()}, {firstName}
+        </h1>
+        <p className="text-sm text-muted-foreground">Here&apos;s how things look today.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
@@ -54,12 +79,16 @@ export default async function DashboardPage({
           value={inr(stats.todayCollection)}
           icon={TrendingUp}
           color="green"
+          trend={trend.collection}
+          deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
         />
         <StatCard
           label="Today's Expenses"
           value={inr(stats.todayExpenses)}
           icon={TrendingDown}
           color="red"
+          trend={trend.expenses}
+          deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
         />
         <StatCard
           label="Cash in Hand"

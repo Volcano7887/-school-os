@@ -35,3 +35,21 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const MOBILE_PRIMARY_COUNT = 4;
+
+export type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+// Sidebar-only grouping (desktop). Mobile bottom nav keeps the flat
+// NAV_ITEMS order above so its "first 4" selection doesn't shift.
+export const NAV_GROUPS: NavGroup[] = [
+  { label: "Overview", items: [NAV_ITEMS[0]] },
+  {
+    label: "Finance",
+    items: [NAV_ITEMS[1], NAV_ITEMS[2], NAV_ITEMS[4], NAV_ITEMS[5], NAV_ITEMS[6]],
+  },
+  { label: "Students", items: [NAV_ITEMS[3]] },
+  { label: "Reports", items: [NAV_ITEMS[7], NAV_ITEMS[8], NAV_ITEMS[9]] },
+  { label: "Settings", items: [NAV_ITEMS[10]] },
+];

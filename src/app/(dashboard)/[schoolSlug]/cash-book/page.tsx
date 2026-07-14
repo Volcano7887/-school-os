@@ -24,6 +24,37 @@ function formatDate(value: string) {
   });
 }
 
+function todayIso() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function BookSummary({ entries }: { entries: CashBookEntry[] }) {
+  const today = todayIso();
+  const todayEntries = entries.filter((e) => e.date === today);
+  const todayIncome = todayEntries.reduce((sum, e) => sum + e.debit, 0);
+  const todayExpense = todayEntries.reduce((sum, e) => sum + e.credit, 0);
+  const closing = entries.at(-1)?.runningBalance ?? 0;
+  const opening = closing - todayIncome + todayExpense;
+
+  const items = [
+    { label: "Opening Balance", value: opening, tone: "" },
+    { label: "Today's Income", value: todayIncome, tone: "text-green-600 dark:text-green-400" },
+    { label: "Today's Expense", value: todayExpense, tone: "text-red-600 dark:text-red-400" },
+    { label: "Closing Balance", value: closing, tone: "font-semibold" },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {items.map((item) => (
+        <div key={item.label} className="rounded-lg border bg-card p-3">
+          <p className="text-xs text-muted-foreground">{item.label}</p>
+          <p className={`text-lg font-medium ${item.tone}`}>{inr(item.value)}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function CashBookTable({ entries }: { entries: CashBookEntry[] }) {
   if (entries.length === 0) {
     return (
@@ -98,10 +129,12 @@ export default async function CashBookPage({
           <TabsTrigger value="cash">Cash in Hand — {inr(cashBalance)}</TabsTrigger>
           <TabsTrigger value="bank">Bank Account — {inr(bankBalance)}</TabsTrigger>
         </TabsList>
-        <TabsContent value="cash" className="mt-4">
+        <TabsContent value="cash" className="mt-4 space-y-4">
+          <BookSummary entries={cashEntries} />
           <CashBookTable entries={cashEntries} />
         </TabsContent>
-        <TabsContent value="bank" className="mt-4">
+        <TabsContent value="bank" className="mt-4 space-y-4">
+          <BookSummary entries={bankEntries} />
           <CashBookTable entries={bankEntries} />
         </TabsContent>
       </Tabs>
