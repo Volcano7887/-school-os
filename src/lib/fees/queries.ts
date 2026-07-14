@@ -50,6 +50,8 @@ export type StudentBalance = {
   totalDue: number;
   totalPaid: number;
   balance: number;
+  guardianName: string | null;
+  guardianPhone: string | null;
 };
 
 export async function getStudentBalances(
@@ -60,7 +62,7 @@ export async function getStudentBalances(
 ): Promise<StudentBalance[]> {
   let studentQuery = supabase
     .from("students")
-    .select("id, full_name, class_id")
+    .select("id, full_name, class_id, guardian_name, guardian_phone")
     .eq("school_id", schoolId)
     .eq("is_active", true)
     .is("deleted_at", null)
@@ -108,6 +110,8 @@ export async function getStudentBalances(
       totalDue,
       totalPaid,
       balance: totalDue - totalPaid,
+      guardianName: s.guardian_name,
+      guardianPhone: s.guardian_phone,
     };
   });
 }

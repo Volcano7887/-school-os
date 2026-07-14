@@ -1,6 +1,6 @@
 import { Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getSchoolIdBySlug } from "@/lib/school/queries";
+import { getSchoolIdBySlug, getSchoolProfile } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
 import { getClasses } from "@/lib/students/queries";
 import { getFeeStructures, getStudentBalances } from "@/lib/fees/queries";
@@ -17,6 +17,7 @@ import {
 import { AcademicYearSetup } from "./academic-year-setup";
 import { FeeStructureDialog } from "./fee-structure-dialog";
 import { RecordPaymentDialog } from "./record-payment-dialog";
+import { SendReminderDropdown } from "./send-reminder-dropdown";
 import { Button } from "@/components/ui/button";
 
 function inr(paise: number) {
@@ -83,11 +84,13 @@ export default async function FeesPage({
     );
   }
 
-  const [classes, structures, balances] = await Promise.all([
+  const [classes, structures, balances, school] = await Promise.all([
     getClasses(supabase, schoolId),
     getFeeStructures(supabase, schoolId, academicYear.id),
     getStudentBalances(supabase, schoolId, academicYear.id, { search: q, classId }),
+    getSchoolProfile(supabase, schoolId),
   ]);
+  const schoolName = school?.name ?? "School";
 
   return (
     <div className="space-y-4">
@@ -160,15 +163,20 @@ export default async function FeesPage({
                         </span>
                       </TableCell>
                       <TableCell>
-                        <RecordPaymentDialog
-                          schoolSlug={schoolSlug}
-                          student={s}
-                          trigger={
-                            <Button size="sm" variant="outline">
-                              Record payment
-                            </Button>
-                          }
-                        />
+                        <div className="flex justify-end gap-2">
+                          {s.balance > 0 && (
+                            <SendReminderDropdown student={s} schoolName={schoolName} />
+                          )}
+                          <RecordPaymentDialog
+                            schoolSlug={schoolSlug}
+                            student={s}
+                            trigger={
+                              <Button size="sm" variant="outline">
+                                Record payment
+                              </Button>
+                            }
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -196,15 +204,20 @@ export default async function FeesPage({
                       {inr(s.totalPaid)} / {inr(s.totalDue)}
                     </span>
                   </div>
-                  <RecordPaymentDialog
-                    schoolSlug={schoolSlug}
-                    student={s}
-                    trigger={
-                      <Button size="sm" variant="outline" className="mt-2 w-full">
-                        Record payment
-                      </Button>
-                    }
-                  />
+                  <div className="mt-2 flex gap-2">
+                    {s.balance > 0 && (
+                      <SendReminderDropdown student={s} schoolName={schoolName} />
+                    )}
+                    <RecordPaymentDialog
+                      schoolSlug={schoolSlug}
+                      student={s}
+                      trigger={
+                        <Button size="sm" variant="outline" className="flex-1">
+                          Record payment
+                        </Button>
+                      }
+                    />
+                  </div>
                 </div>
               );
             })}
