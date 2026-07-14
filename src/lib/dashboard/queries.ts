@@ -212,3 +212,69 @@ export async function getRecentTransactions(
 
   return all.sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
 }
+
+export type UpcomingFeeDueItem = {
+  studentId: string;
+  fullName: string;
+  className: string | null;
+  balance: number;
+};
+
+export async function getUpcomingFeeDue(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  limit = 5
+): Promise<UpcomingFeeDueItem[]> {
+  const academicYear = await getCurrentAcademicYear(supabase, schoolId);
+  if (!academicYear) return [];
+
+  const balances = await getStudentBalances(supabase, schoolId, academicYear.id, {});
+
+  return balances
+    .filter((b) => b.balance > 0)
+    .sort((a, b) => b.balance - a.balance)
+    .slice(0, limit)
+    .map((b) => ({
+      studentId: b.studentId,
+      fullName: b.fullName,
+      className: b.className,
+      balance: b.balance,
+    }));
+}
+
+export type RecentExpenseItem = {
+  id: string;
+  categoryName: string;
+  amount: number;
+  expenseDate: string;
+};
+
+export async function getRecentExpensesList(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  limit = 5
+): Promise<RecentExpenseItem[]> {
+  const { data: expenses } = await supabase
+    .from("expenses")
+    .select("id, amount, expense_date, expense_category_id")
+    .eq("school_id", schoolId)
+    .order("expense_date", { ascending: false })
+    .limit(limit);
+
+  if (!expenses || expenses.length === 0) return [];
+
+  const categoryIds = [...new Set(expenses.map((e) => e.expense_category_id))];
+  const { data: categories } = await supabase
+    .from("expense_categories")
+    .select("id, name")
+    .in("id", categoryIds);
+
+  const categoryNameById = new Map((categories ?? []).map((c) => [c.id, c.name]));
+
+  return expenses.map((e) => ({
+    id: e.id,
+    categoryName: categoryNameById.get(e.expense_category_id) ?? "Expense",
+    amount: e.amount,
+    expenseDate: e.expense_date,
+  }));
+}
