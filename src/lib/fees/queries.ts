@@ -47,6 +47,7 @@ export type StudentBalance = {
   studentId: string;
   fullName: string;
   className: string | null;
+  admissionNo: string | null;
   totalDue: number;
   totalPaid: number;
   balance: number;
@@ -62,7 +63,7 @@ export async function getStudentBalances(
 ): Promise<StudentBalance[]> {
   let studentQuery = supabase
     .from("students")
-    .select("id, full_name, class_id, guardian_name, guardian_phone")
+    .select("id, full_name, admission_no, class_id, guardian_name, guardian_phone")
     .eq("school_id", schoolId)
     .eq("is_active", true)
     .is("deleted_at", null)
@@ -107,6 +108,7 @@ export async function getStudentBalances(
       studentId: s.id,
       fullName: s.full_name,
       className: s.class_id ? (classNameById.get(s.class_id) ?? null) : null,
+      admissionNo: s.admission_no,
       totalDue,
       totalPaid,
       balance: totalDue - totalPaid,
