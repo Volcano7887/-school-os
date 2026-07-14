@@ -40,7 +40,8 @@ export function ExpenseFormDialog({
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const [billFileName, setBillFileName] = useState<string | null>(null);
+  const [billFile, setBillFile] = useState<{ name: string; isImage: boolean } | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const action = createExpense.bind(null, schoolSlug);
   const [state, formAction, isPending] = useActionState(action, initialActionState);
@@ -50,14 +51,39 @@ export function ExpenseFormDialog({
       // Syncing to the server action's result, not deriving render state.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(false);
-      setBillFileName(null);
+      setBillFile(null);
       toast.success("Expense saved");
     }
   }, [state.status]);
 
+  // Object URLs must be revoked or the browser leaks memory for as long as
+  // the tab stays open — every new preview releases the previous one.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+
+    if (!file) {
+      setBillFile(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    const isImage = file.type.startsWith("image/");
+    setBillFile({ name: file.name, isImage });
+    setPreviewUrl(isImage ? URL.createObjectURL(file) : null);
+  }
+
   function clearFile() {
     if (fileInputRef.current) fileInputRef.current.value = "";
-    setBillFileName(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setBillFile(null);
+    setPreviewUrl(null);
   }
 
   return (
@@ -160,23 +186,34 @@ export function ExpenseFormDialog({
               name="bill"
               type="file"
               accept="image/*,application/pdf"
-              onChange={(e) => setBillFileName(e.target.files?.[0]?.name ?? null)}
-              className={billFileName ? "hidden" : undefined}
+              onChange={handleFileChange}
+              className={billFile ? "hidden" : undefined}
             />
-            {billFileName && (
-              <div className="flex items-center justify-between rounded-md border p-2 text-sm">
-                <span className="flex items-center gap-2 truncate">
-                  <FileText className="size-4 shrink-0 text-muted-foreground" />
-                  {billFileName}
-                </span>
-                <button
-                  type="button"
-                  onClick={clearFile}
-                  className="text-muted-foreground hover:text-foreground"
-                  aria-label="Remove file"
-                >
-                  <X className="size-4" />
-                </button>
+            {billFile && (
+              <div className="overflow-hidden rounded-md border">
+                <div className="flex items-center justify-between p-2 text-sm">
+                  <span className="flex items-center gap-2 truncate">
+                    <FileText className="size-4 shrink-0 text-muted-foreground" />
+                    {billFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearFile}
+                    className="text-muted-foreground hover:text-foreground"
+                    aria-label="Remove file"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+                {billFile.isImage && previewUrl && (
+                  // A blob: object URL for a locally-picked file, not a servable/optimizable app asset — next/image can't handle it.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={previewUrl}
+                    alt="Bill preview"
+                    className="max-h-48 w-full border-t object-contain"
+                  />
+                )}
               </div>
             )}
           </div>
