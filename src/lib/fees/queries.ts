@@ -161,6 +161,8 @@ export type FeeReceipt = {
   admissionNo: string | null;
   guardianName: string | null;
   guardianEmail: string | null;
+  guardianPhone: string | null;
+  schoolId: string;
 };
 
 export async function getFeeReceipt(
@@ -179,7 +181,7 @@ export async function getFeeReceipt(
 
   const { data: student } = await supabase
     .from("students")
-    .select("full_name, admission_no, guardian_name, guardian_email, class_id")
+    .select("full_name, admission_no, guardian_name, guardian_email, guardian_phone, class_id")
     .eq("id", payment.student_id)
     .single();
 
@@ -207,5 +209,7 @@ export async function getFeeReceipt(
     admissionNo: student.admission_no,
     guardianName: student.guardian_name,
     guardianEmail: student.guardian_email,
+    guardianPhone: student.guardian_phone,
+    schoolId,
   };
 }

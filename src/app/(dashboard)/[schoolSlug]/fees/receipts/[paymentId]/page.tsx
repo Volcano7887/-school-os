@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
+import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug, getSchoolProfile } from "@/lib/school/queries";
 import { getFeeReceipt } from "@/lib/fees/queries";
+import { buildWhatsAppLink } from "@/lib/whatsapp/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { PrintButton } from "@/components/shared/print-button";
 
 const PAYMENT_MODE_LABEL: Record<string, string> = {
@@ -37,11 +40,38 @@ export default async function FeeReceiptPage({
 
   if (!school || !receipt) notFound();
 
+  const whatsAppMessage = [
+    `Dear ${receipt.guardianName ?? "Parent"},`,
+    `We have received ₹${(receipt.amount / 100).toLocaleString("en-IN")} from ${receipt.studentName} (${receipt.className ?? "—"})${
+      receipt.periodLabel ? ` for ${receipt.periodLabel}` : ""
+    }.`,
+    `Receipt No: ${receipt.receiptNo}, Date: ${formatDate(receipt.paidAt)}.`,
+    `Thank you — ${school.name}`,
+  ].join("\n");
+
+  const whatsAppLink = receipt.guardianPhone
+    ? buildWhatsAppLink(receipt.guardianPhone, whatsAppMessage)
+    : null;
+
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <div className="flex justify-end print:hidden">
+      <div className="flex justify-end gap-2 print:hidden">
+        {whatsAppLink && (
+          <Button asChild variant="outline">
+            <a href={whatsAppLink} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="size-4" />
+              Send via WhatsApp
+            </a>
+          </Button>
+        )}
         <PrintButton />
       </div>
+      {!whatsAppLink && (
+        <p className="text-right text-xs text-muted-foreground print:hidden">
+          Add a guardian phone number on this student&apos;s profile to send
+          receipts via WhatsApp.
+        </p>
+      )}
 
       <Card>
         <CardContent className="space-y-4 p-6">
