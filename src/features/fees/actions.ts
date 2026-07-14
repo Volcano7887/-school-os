@@ -101,5 +101,9 @@ export async function recordFeePayment(
 
   revalidatePath(`/${schoolSlug}/fees`);
   revalidatePath(`/${schoolSlug}/students/${parsed.data.studentId}`);
-  return { status: "success", message: data.receipt_no };
+  return {
+    status: "success",
+    message: data.receipt_no,
+    data: { paymentId: data.id },
+  };
 }

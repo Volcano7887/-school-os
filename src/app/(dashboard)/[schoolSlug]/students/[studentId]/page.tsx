@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
@@ -156,6 +157,7 @@ export default async function StudentProfilePage({
                   <TableHead>Amount</TableHead>
                   <TableHead>Mode</TableHead>
                   <TableHead>Remarks</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -166,6 +168,14 @@ export default async function StudentProfilePage({
                     <TableCell>₹{(p.amount / 100).toLocaleString("en-IN")}</TableCell>
                     <TableCell>{PAYMENT_MODE_LABEL[p.paymentMode]}</TableCell>
                     <TableCell>{p.remarks ?? p.periodLabel ?? "—"}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/${schoolSlug}/fees/receipts/${p.id}`}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Receipt
+                      </Link>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

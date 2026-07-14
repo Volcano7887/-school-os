@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { recordFeePayment } from "@/features/fees/actions";
 import { initialActionState } from "@/lib/types/action-state";
@@ -38,6 +39,7 @@ export function RecordPaymentDialog({
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const action = recordFeePayment.bind(null, schoolSlug);
   const [state, formAction, isPending] = useActionState(action, initialActionState);
 
@@ -47,11 +49,20 @@ export function RecordPaymentDialog({
       // deriving render state — closing the dialog here is correct.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(false);
+      const paymentId = state.data?.paymentId;
       toast.success(
-        state.message ? `Payment recorded — receipt ${state.message}` : "Payment recorded"
+        state.message ? `Payment recorded — receipt ${state.message}` : "Payment recorded",
+        paymentId
+          ? {
+              action: {
+                label: "View Receipt",
+                onClick: () => router.push(`/${schoolSlug}/fees/receipts/${paymentId}`),
+              },
+            }
+          : undefined
       );
     }
-  }, [state.status, state.message]);
+  }, [state.status, state.message, state.data, router, schoolSlug]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

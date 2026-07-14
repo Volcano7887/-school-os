@@ -130,3 +130,17 @@
     @apply font-sans;
   }
 }
+
+/* App shell chrome (sidebar, topbar, bottom nav) never belongs on a
+   printed page — used by the fee receipt and any future print view. */
+@media print {
+  aside,
+  header,
+  nav {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}

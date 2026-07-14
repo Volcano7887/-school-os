@@ -148,3 +148,64 @@ export async function getStudentPayments(
     remarks: p.remarks,
   }));
 }
+
+export type FeeReceipt = {
+  receiptNo: string;
+  amount: number;
+  paymentMode: string;
+  paidAt: string;
+  periodLabel: string | null;
+  remarks: string | null;
+  studentName: string;
+  className: string | null;
+  admissionNo: string | null;
+  guardianName: string | null;
+  guardianEmail: string | null;
+};
+
+export async function getFeeReceipt(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  paymentId: string
+): Promise<FeeReceipt | null> {
+  const { data: payment, error } = await supabase
+    .from("fee_payments")
+    .select("receipt_no, amount, payment_mode, paid_at, period_label, remarks, student_id")
+    .eq("school_id", schoolId)
+    .eq("id", paymentId)
+    .single();
+
+  if (error || !payment) return null;
+
+  const { data: student } = await supabase
+    .from("students")
+    .select("full_name, admission_no, guardian_name, guardian_email, class_id")
+    .eq("id", payment.student_id)
+    .single();
+
+  if (!student) return null;
+
+  let className: string | null = null;
+  if (student.class_id) {
+    const { data: cls } = await supabase
+      .from("classes")
+      .select("name")
+      .eq("id", student.class_id)
+      .single();
+    className = cls?.name ?? null;
+  }
+
+  return {
+    receiptNo: payment.receipt_no,
+    amount: payment.amount,
+    paymentMode: payment.payment_mode,
+    paidAt: payment.paid_at,
+    periodLabel: payment.period_label,
+    remarks: payment.remarks,
+    studentName: student.full_name,
+    className,
+    admissionNo: student.admission_no,
+    guardianName: student.guardian_name,
+    guardianEmail: student.guardian_email,
+  };
+}
