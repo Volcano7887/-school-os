@@ -96,6 +96,51 @@ export async function getAccountLedger(
   return { entries, account };
 }
 
+export type TrialBalanceRow = LedgerAccountOption & {
+  debitTotal: number;
+  creditTotal: number;
+  balance: number;
+};
+
+export async function getTrialBalance(
+  supabase: SupabaseClient<Database>,
+  schoolId: string
+): Promise<TrialBalanceRow[]> {
+  const accounts = await getLedgerAccounts(supabase, schoolId);
+  if (accounts.length === 0) return [];
+
+  const { data: journalEntries } = await supabase
+    .from("journal_entries")
+    .select("id")
+    .eq("school_id", schoolId);
+
+  const entryIds = (journalEntries ?? []).map((e) => e.id);
+  if (entryIds.length === 0) {
+    return accounts.map((a) => ({ ...a, debitTotal: 0, creditTotal: 0, balance: 0 }));
+  }
+
+  const { data: lines } = await supabase
+    .from("journal_entry_lines")
+    .select("ledger_account_id, debit_amount, credit_amount")
+    .in("journal_entry_id", entryIds);
+
+  const totalsByAccount = new Map<string, { debit: number; credit: number }>();
+  for (const line of lines ?? []) {
+    const existing = totalsByAccount.get(line.ledger_account_id) ?? { debit: 0, credit: 0 };
+    existing.debit += line.debit_amount;
+    existing.credit += line.credit_amount;
+    totalsByAccount.set(line.ledger_account_id, existing);
+  }
+
+  return accounts.map((account) => {
+    const totals = totalsByAccount.get(account.id) ?? { debit: 0, credit: 0 };
+    const balance = isDebitNormal(account.type)
+      ? totals.debit - totals.credit
+      : totals.credit - totals.debit;
+    return { ...account, debitTotal: totals.debit, creditTotal: totals.credit, balance };
+  });
+}
+
 export type CashBookEntry = LedgerEntry & { type: "in" | "out" };
 
 export async function getCashBookEntries(
