@@ -1,9 +1,16 @@
 import { TrendingUp, TrendingDown, Wallet, Clock, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
-import { getDashboardStats } from "@/lib/dashboard/queries";
+import {
+  getDashboardStats,
+  getMonthlyIncomeExpense,
+  getRecentTransactions,
+} from "@/lib/dashboard/queries";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { StatCard } from "@/components/shared/stat-card";
+import { IncomeExpenseChart } from "@/components/shared/income-expense-chart";
+import { RecentTransactions } from "@/components/shared/recent-transactions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function inr(paise: number) {
   return `₹${(paise / 100).toLocaleString("en-IN")}`;
@@ -19,7 +26,11 @@ export default async function DashboardPage({
   const schoolId = await getSchoolIdBySlug(supabase, schoolSlug);
   if (!schoolId) return null;
 
-  const stats = await getDashboardStats(supabase, schoolId);
+  const [stats, chartData, recentTransactions] = await Promise.all([
+    getDashboardStats(supabase, schoolId),
+    getMonthlyIncomeExpense(supabase, schoolId),
+    getRecentTransactions(supabase, schoolId),
+  ]);
 
   return (
     <div className="space-y-4">
@@ -59,6 +70,25 @@ export default async function DashboardPage({
           icon={Users}
           color="purple"
         />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Cash Flow (Last 6 months)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <IncomeExpenseChart data={chartData} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Transactions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RecentTransactions transactions={recentTransactions} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
