@@ -4,20 +4,45 @@ import { useState } from "react";
 import { Sparkles, Bell } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// Decorative only — no real analysis is computed yet.
-const TRENDS: number[][] = [
-  [4, 6, 5, 8, 7, 10, 12],
-  [10, 8, 9, 6, 7, 5, 4],
-  [3, 5, 6, 5, 8, 9, 11],
-];
-
-const SLIDES = [
-  "Automatic insights about fee trends, likely defaulters, and spending patterns will show up here — nothing is computed yet.",
-  "Spot students likely to fall behind on fees before it happens, based on their payment history.",
-  "Get alerted to unusual spending patterns the moment they show up in your expenses.",
+// Decorative only — no real analysis is computed yet. Text/shape mirror
+// the reference mockup's example insight so the card reads as "real"
+// even though nothing here is actually computed. Each slide is split into
+// explicit before/bold/after segments rather than string-replacing a
+// highlight out of a sentence, which breaks for highlights that aren't
+// at the start (e.g. "...is 18% lower...").
+const SLIDES: { before: string; bold: string; after: string; trend: number[] }[] = [
+  {
+    before: "Fee collection is ",
+    bold: "18% lower",
+    after: " than last month. Consider reminding 25 students with dues.",
+    trend: [4, 6, 5, 8, 7, 10, 12],
+  },
+  {
+    before: "",
+    bold: "12 students",
+    after: " are 2+ months overdue on fees — the highest-risk group to follow up with first.",
+    trend: [10, 8, 9, 6, 7, 5, 4],
+  },
+  {
+    before: "",
+    bold: "Stationary spending",
+    after: " is up 30% this month compared to your 6-month average.",
+    trend: [3, 5, 6, 5, 8, 9, 11],
+  },
+  {
+    before: "",
+    bold: "Salary",
+    after: " is your largest expense category at 41% of total spend this month.",
+    trend: [6, 6, 7, 8, 8, 9, 10],
+  },
+  {
+    before: "Fee recovery is at ",
+    bold: "72%",
+    after: " for this year — on track versus the same point last year.",
+    trend: [5, 7, 6, 9, 8, 11, 13],
+  },
 ];
 
 function Sparkline({ data }: { data: number[] }) {
@@ -47,9 +72,8 @@ function Sparkline({ data }: { data: number[] }) {
 }
 
 export function AiInsightCard() {
-  const totalSlides = SLIDES.length + 1;
   const [slide, setSlide] = useState(0);
-  const isLastSlide = slide === SLIDES.length;
+  const current = SLIDES[slide];
 
   return (
     <Card className="border-accent bg-accent/40">
@@ -61,36 +85,27 @@ export function AiInsightCard() {
             </div>
             <p className="font-medium">AI Insight</p>
           </div>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-            Upcoming Feature
-          </span>
+          <button
+            type="button"
+            onClick={() =>
+              toast.success("We'll let you know when AI Insights is ready.")
+            }
+            className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            <Bell className="size-3" />
+            Notify Me
+          </button>
         </div>
 
-        {isLastSlide ? (
-          <div className="mt-3 flex flex-col items-start gap-3">
-            <p className="text-sm text-muted-foreground">
-              Want to know the moment AI Insights launches?
-            </p>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                toast.success("We'll let you know when AI Insights is ready.")
-              }
-            >
-              <Bell className="size-4" />
-              Notify me when available
-            </Button>
-          </div>
-        ) : (
-          <>
-            <p className="mt-3 text-sm text-muted-foreground">{SLIDES[slide]}</p>
-            <Sparkline data={TRENDS[slide]} />
-          </>
-        )}
+        <p className="mt-3 text-sm text-muted-foreground">
+          {current.before}
+          <span className="font-semibold text-foreground">{current.bold}</span>
+          {current.after}
+        </p>
+        <Sparkline data={current.trend} />
 
         <div className="mt-3 flex items-center justify-center gap-1.5">
-          {Array.from({ length: totalSlides }).map((_, i) => (
+          {SLIDES.map((_, i) => (
             <button
               key={i}
               type="button"
