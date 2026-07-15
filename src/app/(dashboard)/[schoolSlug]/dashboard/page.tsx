@@ -105,7 +105,7 @@ export default async function DashboardPage({
   });
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <Breadcrumb items={[{ label: "Dashboard" }]} />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -135,89 +135,94 @@ export default async function DashboardPage({
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Today's Collection"
-          value={inr(stats.todayCollection)}
-          icon={Wallet}
-          color="purple"
-          trend={trend.collection}
-          deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
-        />
-        <StatCard
-          label="Today's Expenses"
-          value={inr(stats.todayExpenses)}
-          icon={TrendingDown}
-          color="green"
-          trend={trend.expenses}
-          deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
-          goodDirection="down"
-        />
-        <StatCard
-          label="Cash in Hand"
-          value={inr(stats.cashInHand)}
-          icon={TrendingUp}
-          color="orange"
-        />
-        <StatCard
-          label="Pending Fees"
-          value={inr(stats.pendingFees)}
-          icon={Clock}
-          color="red"
-        />
-      </div>
+      {/* Main column (left, 2/3) + right rail — a persistent two-column
+          split, not row-by-row grids, so the rail runs alongside the main
+          column instead of interleaving with it. */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="Today's Collection"
+              value={inr(stats.todayCollection)}
+              icon={Wallet}
+              color="purple"
+              trend={trend.collection}
+              deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
+            />
+            <StatCard
+              label="Today's Expenses"
+              value={inr(stats.todayExpenses)}
+              icon={TrendingDown}
+              color="green"
+              trend={trend.expenses}
+              deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
+              goodDirection="down"
+            />
+            <StatCard
+              label="Cash in Hand"
+              value={inr(stats.cashInHand)}
+              icon={TrendingUp}
+              color="orange"
+            />
+            <StatCard
+              label="Pending Fees"
+              value={inr(stats.pendingFees)}
+              icon={Clock}
+              color="red"
+            />
+          </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>6 Month Cash Flow</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <IncomeExpenseChart data={chartData} />
-          </CardContent>
-        </Card>
-        <AiInsightCard />
-      </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>6 Month Cash Flow</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <IncomeExpenseChart data={chartData} />
+            </CardContent>
+          </Card>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <MonthlyCollectionPanel
-          schoolSlug={schoolSlug}
-          months={chartData}
-          monthlyFeeTarget={school?.monthlyFeeTarget ?? null}
-        />
-        <FeeRecoveryGauge
-          schoolSlug={schoolSlug}
-          collected={collected}
-          totalDue={totalDue}
-          studentsPending={studentsPending}
-        />
-      </div>
+          <FeeRecoveryGauge
+            schoolSlug={schoolSlug}
+            collected={collected}
+            totalDue={totalDue}
+            studentsPending={studentsPending}
+          />
 
-      <ActionCenter alerts={alerts} />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Recent Activity</CardTitle>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/${schoolSlug}/audit-log`}>View all</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <RecentTransactions transactions={recentTransactions} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Expense Categories</CardTitle>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/${schoolSlug}/reports`}>View full report</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <ExpenseCategoryDonut data={expenseByCategory} />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Activity</CardTitle>
-            <Button asChild variant="ghost" size="sm">
-              <Link href={`/${schoolSlug}/audit-log`}>View all</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <RecentTransactions transactions={recentTransactions} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Expense Categories</CardTitle>
-            <Button asChild variant="ghost" size="sm">
-              <Link href={`/${schoolSlug}/reports`}>View full report</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <ExpenseCategoryDonut data={expenseByCategory} />
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <AiInsightCard />
+          <MonthlyCollectionPanel
+            schoolSlug={schoolSlug}
+            months={chartData}
+            monthlyFeeTarget={school?.monthlyFeeTarget ?? null}
+          />
+          <ActionCenter schoolSlug={schoolSlug} alerts={alerts} />
+        </div>
       </div>
 
       <EndOfDayClosing

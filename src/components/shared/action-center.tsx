@@ -10,7 +10,13 @@ export type ActionCenterAlert = {
   priority: "high" | "attention";
 };
 
-export function ActionCenter({ alerts }: { alerts: ActionCenterAlert[] }) {
+export function ActionCenter({
+  schoolSlug,
+  alerts,
+}: {
+  schoolSlug: string;
+  alerts: ActionCenterAlert[];
+}) {
   return (
     <Card>
       <CardContent>
@@ -58,6 +64,15 @@ export function ActionCenter({ alerts }: { alerts: ActionCenterAlert[] }) {
               );
             })}
           </ul>
+        )}
+        {alerts.length > 0 && (
+          <Link
+            href={`/${schoolSlug}/audit-log`}
+            className="mt-2 flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
+            View all alerts
+            <ChevronRight className="size-3.5" />
+          </Link>
         )}
       </CardContent>
     </Card>
