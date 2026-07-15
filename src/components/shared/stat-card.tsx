@@ -45,7 +45,7 @@ function Sparkline({ data, color }: { data: number[]; color: StatCardColor }) {
     .join(" ");
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="h-6 w-20 shrink-0" aria-hidden="true">
+    <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 h-6 w-full" preserveAspectRatio="none" aria-hidden="true">
       <polyline
         points={points}
         fill="none"
@@ -90,7 +90,7 @@ export function StatCard({
         GRADIENTS[color]
       )}
     >
-      <CardContent className="flex items-start justify-between gap-3">
+      <CardContent>
         <div className="flex items-start gap-3">
           <div
             className={cn(
@@ -100,8 +100,8 @@ export function StatCard({
           >
             <Icon className="size-5.5" />
           </div>
-          <div className="min-w-0">
-            <p className="text-sm text-muted-foreground">{label}</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm text-muted-foreground">{label}</p>
             <p className="text-2xl font-bold">{value}</p>
             {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
             {deltaPercent !== undefined && (
