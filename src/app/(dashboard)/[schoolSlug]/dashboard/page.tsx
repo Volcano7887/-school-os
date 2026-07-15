@@ -144,7 +144,7 @@ export default async function DashboardPage({
               actual width depends on whether the right rail is present,
               not just the screen size, so lg:/xl: alone can't tell it
               apart from a full-width layout. */}
-          <div className="grid gap-6 @sm:grid-cols-2 @3xl:grid-cols-4">
+          <div className="grid gap-6 @sm:grid-cols-2 @2xl:grid-cols-4">
             <StatCard
               label="Today's Collection"
               value={inr(stats.todayCollection)}
