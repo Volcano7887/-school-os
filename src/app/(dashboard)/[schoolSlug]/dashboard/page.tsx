@@ -13,7 +13,6 @@ import {
   getRecentTransactions,
   getDailyTrend,
 } from "@/lib/dashboard/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { StatCard } from "@/components/shared/stat-card";
 import { IncomeExpenseChart } from "@/components/shared/income-expense-chart";
 import { RecentTransactions } from "@/components/shared/recent-transactions";
@@ -106,33 +105,20 @@ export default async function DashboardPage({
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: "Dashboard" }]} />
-
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Finance Command Center</h1>
+            <h1 className="text-2xl font-bold">{school?.name ?? "Your school"}</h1>
             <BadgeCheck className="size-6 text-primary" />
           </div>
-          <p className="text-sm text-muted-foreground">
-            {school?.name ?? "Your school"} · {formattedDate}
-          </p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-3">
+            <p className="text-sm text-muted-foreground">Finance Command Center</p>
+            <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+              {formattedDate}
+            </span>
+          </div>
         </div>
         <QuickActionMenu schoolSlug={schoolSlug} />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm">
-        <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
-          <CheckCircle2 className="size-4" />
-          Everything looks good today.
-        </span>
-        {alerts.length > 0 && (
-          <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-            <Clock className="size-4" />
-            {alerts.length} {alerts.length === 1 ? "item requires" : "items require"} your
-            attention.
-          </span>
-        )}
       </div>
 
       {/* Main column (left, 2/3) + right rail — a persistent two-column
@@ -140,6 +126,20 @@ export default async function DashboardPage({
           column instead of interleaving with it. */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm">
+            <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+              <CheckCircle2 className="size-4" />
+              Everything looks good today.
+            </span>
+            {alerts.length > 0 && (
+              <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+                <Clock className="size-4" />
+                {alerts.length} {alerts.length === 1 ? "item requires" : "items require"} your
+                attention.
+              </span>
+            )}
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Today's Collection"
