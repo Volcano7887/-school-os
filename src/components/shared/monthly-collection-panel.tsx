@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -9,16 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { inr } from "@/lib/utils";
 import type { MonthlyIncomeExpense } from "@/lib/dashboard/queries";
 
-function inr(paise: number) {
-  return `₹${(paise / 100).toLocaleString("en-IN")}`;
-}
-
 export function MonthlyCollectionPanel({
+  schoolSlug,
   months,
   monthlyFeeTarget,
 }: {
+  schoolSlug: string;
   months: MonthlyIncomeExpense[];
   monthlyFeeTarget: number | null;
 }) {
@@ -26,7 +26,22 @@ export function MonthlyCollectionPanel({
   const selected = months[selectedIndex];
 
   if (!monthlyFeeTarget) {
-    return null;
+    return (
+      <Card>
+        <CardContent className="flex h-full flex-col items-center justify-center gap-2 text-center">
+          <p className="font-medium">Monthly Collection</p>
+          <p className="text-sm text-muted-foreground">
+            Set a monthly collection goal to track progress here.
+          </p>
+          <Link
+            href={`/${schoolSlug}/settings`}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            Set goal in Settings
+          </Link>
+        </CardContent>
+      </Card>
+    );
   }
 
   const collected = selected?.income ?? 0;

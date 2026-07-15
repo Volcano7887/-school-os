@@ -11,10 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-function inr(paise: number) {
-  return `₹${(paise / 100).toLocaleString("en-IN")}`;
-}
+import { inr } from "@/lib/utils";
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-IN", {

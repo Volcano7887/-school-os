@@ -1,10 +1,7 @@
 import { Lock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-function inr(paise: number) {
-  return `₹${(paise / 100).toLocaleString("en-IN")}`;
-}
+import { inr } from "@/lib/utils";
 
 export function EndOfDayClosing({
   opening,

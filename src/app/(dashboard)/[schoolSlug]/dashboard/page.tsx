@@ -26,10 +26,7 @@ import { ActionCenter, type ActionCenterAlert } from "@/components/shared/action
 import { EndOfDayClosing } from "@/components/shared/end-of-day-closing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-function inr(paise: number) {
-  return `₹${(paise / 100).toLocaleString("en-IN")}`;
-}
+import { inr } from "@/lib/utils";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -183,7 +180,11 @@ export default async function DashboardPage({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <MonthlyCollectionPanel months={chartData} monthlyFeeTarget={school?.monthlyFeeTarget ?? null} />
+        <MonthlyCollectionPanel
+          schoolSlug={schoolSlug}
+          months={chartData}
+          monthlyFeeTarget={school?.monthlyFeeTarget ?? null}
+        />
         <FeeRecoveryGauge
           schoolSlug={schoolSlug}
           collected={collected}
