@@ -105,14 +105,14 @@ export default async function DashboardPage({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Breadcrumb items={[{ label: "Dashboard" }]} />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-1.5">
-            <h1 className="text-xl font-semibold">Finance Command Center</h1>
-            <BadgeCheck className="size-5 text-primary" />
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Finance Command Center</h1>
+            <BadgeCheck className="size-6 text-primary" />
           </div>
           <p className="text-sm text-muted-foreground">
             {school?.name ?? "Your school"} · {formattedDate}

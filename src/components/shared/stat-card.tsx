@@ -4,19 +4,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const ICON_COLORS = {
-  green: "bg-green-100 text-green-600 dark:bg-green-500/15 dark:text-green-400",
-  red: "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400",
-  blue: "bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
-  orange: "bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
-  purple: "bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400",
+  green: "bg-green-600 text-white dark:bg-green-500",
+  red: "bg-red-600 text-white dark:bg-red-500",
+  blue: "bg-blue-600 text-white dark:bg-blue-500",
+  orange: "bg-orange-500 text-white dark:bg-orange-400",
+  purple: "bg-purple-600 text-white dark:bg-purple-500",
 } as const;
 
 const GRADIENTS = {
-  green: "from-green-50 to-transparent dark:from-green-500/10",
-  red: "from-red-50 to-transparent dark:from-red-500/10",
-  blue: "from-blue-50 to-transparent dark:from-blue-500/10",
-  orange: "from-orange-50 to-transparent dark:from-orange-500/10",
-  purple: "from-purple-50 to-transparent dark:from-purple-500/10",
+  green: "from-green-100 to-green-50/60 dark:from-green-500/20 dark:to-green-500/5",
+  red: "from-red-100 to-red-50/60 dark:from-red-500/20 dark:to-red-500/5",
+  blue: "from-blue-100 to-blue-50/60 dark:from-blue-500/20 dark:to-blue-500/5",
+  orange: "from-orange-100 to-orange-50/60 dark:from-orange-500/20 dark:to-orange-500/5",
+  purple: "from-purple-100 to-purple-50/60 dark:from-purple-500/20 dark:to-purple-500/5",
 } as const;
 
 const SPARK_COLORS = {
@@ -94,15 +94,15 @@ export function StatCard({
         <div className="flex items-start gap-3">
           <div
             className={cn(
-              "flex size-9 shrink-0 items-center justify-center rounded-full",
+              "flex size-11 shrink-0 items-center justify-center rounded-full",
               ICON_COLORS[color]
             )}
           >
-            <Icon className="size-4.5" />
+            <Icon className="size-5.5" />
           </div>
           <div className="min-w-0">
             <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-xl font-semibold">{value}</p>
+            <p className="text-2xl font-bold">{value}</p>
             {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
             {deltaPercent !== undefined && (
               <p
