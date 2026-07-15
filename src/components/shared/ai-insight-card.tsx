@@ -9,56 +9,68 @@ import { cn } from "@/lib/utils";
 // Decorative only — no real analysis is computed yet. Text/shape mirror
 // the reference mockup's example insight so the card reads as "real"
 // even though nothing here is actually computed. Each slide is split into
-// explicit before/bold/after segments rather than string-replacing a
-// highlight out of a sentence, which breaks for highlights that aren't
-// at the start (e.g. "...is 18% lower...").
-const SLIDES: { before: string; bold: string; after: string; trend: number[] }[] = [
+// explicit before/bold/afterBold segments (first sentence) plus a second
+// sentence rendered on its own line, matching the mockup's two-line layout
+// — not a single flowing paragraph that wraps wherever the container
+// happens to break it.
+const SLIDES: {
+  before: string;
+  bold: string;
+  afterBold: string;
+  secondLine: string;
+  trend: number[];
+}[] = [
   {
     before: "Fee collection is ",
     bold: "18% lower",
-    after: " than last month. Consider reminding 25 students with dues.",
+    afterBold: " than last month.",
+    secondLine: "Consider reminding 25 students with dues.",
     trend: [4, 6, 5, 8, 7, 10, 12],
   },
   {
     before: "",
     bold: "12 students",
-    after: " are 2+ months overdue on fees — the highest-risk group to follow up with first.",
+    afterBold: " are 2+ months overdue on fees.",
+    secondLine: "This is the highest-risk group to follow up with first.",
     trend: [10, 8, 9, 6, 7, 5, 4],
   },
   {
     before: "",
     bold: "Stationary spending",
-    after: " is up 30% this month compared to your 6-month average.",
+    afterBold: " is up 30% this month.",
+    secondLine: "That's well above your 6-month average.",
     trend: [3, 5, 6, 5, 8, 9, 11],
   },
   {
     before: "",
     bold: "Salary",
-    after: " is your largest expense category at 41% of total spend this month.",
+    afterBold: " is your largest expense category.",
+    secondLine: "It makes up 41% of total spend this month.",
     trend: [6, 6, 7, 8, 8, 9, 10],
   },
   {
     before: "Fee recovery is at ",
     bold: "72%",
-    after: " for this year — on track versus the same point last year.",
+    afterBold: " for this year.",
+    secondLine: "That's on track versus the same point last year.",
     trend: [5, 7, 6, 9, 8, 11, 13],
   },
 ];
 
 function Sparkline({ data }: { data: number[] }) {
   const w = 120;
-  const h = 32;
+  const h = 36;
   const max = Math.max(...data);
-  const points = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - (v / max) * h;
-      return `${x},${y}`;
-    })
-    .join(" ");
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  const coords = data.map((v, i) => ({
+    x: (i / (data.length - 1)) * w,
+    y: h - ((v - min) / range) * h,
+  }));
+  const points = coords.map((c) => `${c.x},${c.y}`).join(" ");
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 h-8 w-full opacity-40" aria-hidden="true">
+    <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 h-9 w-full" aria-hidden="true">
       <polyline
         points={points}
         fill="none"
@@ -67,6 +79,9 @@ function Sparkline({ data }: { data: number[] }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+      {coords.map((c, i) => (
+        <circle key={i} cx={c.x} cy={c.y} r="2.5" fill="var(--primary)" />
+      ))}
     </svg>
   );
 }
@@ -80,7 +95,7 @@ export function AiInsightCard() {
       <CardContent>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Sparkles className="size-4" />
             </div>
             <p className="font-medium">AI Insight</p>
@@ -100,7 +115,9 @@ export function AiInsightCard() {
         <p className="mt-3 text-sm text-muted-foreground">
           {current.before}
           <span className="font-semibold text-foreground">{current.bold}</span>
-          {current.after}
+          {current.afterBold}
+          <br />
+          {current.secondLine}
         </p>
         <Sparkline data={current.trend} />
 
