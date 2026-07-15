@@ -1,4 +1,4 @@
-import { Lock } from "lucide-react";
+import { Lock, Wallet, TrendingUp, TrendingDown, Landmark, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { inr } from "@/lib/utils";
@@ -15,10 +15,20 @@ export function EndOfDayClosing({
   closing: number;
 }) {
   const items = [
-    { label: "Opening Cash", value: opening },
-    { label: "Total Income", value: income, tone: "text-green-600 dark:text-green-400" },
-    { label: "Total Expense", value: expense, tone: "text-red-600 dark:text-red-400" },
-    { label: "Closing Cash", value: closing, tone: "font-semibold" },
+    { label: "Opening Cash", value: opening, icon: Wallet },
+    {
+      label: "Total Income",
+      value: income,
+      icon: TrendingUp,
+      tone: "text-green-600 dark:text-green-400",
+    },
+    {
+      label: "Total Expense",
+      value: expense,
+      icon: TrendingDown,
+      tone: "text-red-600 dark:text-red-400",
+    },
+    { label: "Closing Cash", value: closing, icon: Landmark, tone: "font-semibold" },
   ];
 
   return (
@@ -36,13 +46,23 @@ export function EndOfDayClosing({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
           {items.map((item) => (
-            <div key={item.label}>
-              <p className="text-xs text-muted-foreground">{item.label}</p>
-              <p className={`text-sm ${item.tone ?? ""}`}>{inr(item.value)}</p>
+            <div key={item.label} className="flex items-center gap-2">
+              <item.icon className="size-4 shrink-0 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className={`text-sm ${item.tone ?? ""}`}>{inr(item.value)}</p>
+              </div>
             </div>
           ))}
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="size-4 shrink-0 text-green-600 dark:text-green-400" />
+            <div>
+              <p className="text-xs text-muted-foreground">Difference</p>
+              <p className="text-sm text-green-600 dark:text-green-400">₹0 Matched</p>
+            </div>
+          </div>
         </div>
 
         <Button disabled title="Coming soon">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, Clock, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Clock, CheckCircle2, Bell, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export type ActionCenterAlert = {
@@ -14,7 +14,10 @@ export function ActionCenter({ alerts }: { alerts: ActionCenterAlert[] }) {
   return (
     <Card>
       <CardContent>
-        <p className="mb-2 font-medium">Action Center</p>
+        <div className="mb-2 flex items-center gap-1.5">
+          <Bell className="size-4 text-muted-foreground" />
+          <p className="font-medium">Action Center</p>
+        </div>
         {alerts.length === 0 ? (
           <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
             <CheckCircle2 className="size-4 text-green-600 dark:text-green-400" />
@@ -49,6 +52,7 @@ export function ActionCenter({ alerts }: { alerts: ActionCenterAlert[] }) {
                         {isHigh ? "High Priority" : "Attention"} · {alert.meta}
                       </p>
                     </div>
+                    <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
                   </Link>
                 </li>
               );

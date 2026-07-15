@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { Info } from "lucide-react";
+import { Info, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-function inr(paise: number) {
-  return `₹${(paise / 100).toLocaleString("en-IN")}`;
-}
+import { inr } from "@/lib/utils";
 
 export function FeeRecoveryGauge({
   schoolSlug,
@@ -77,7 +74,15 @@ export function FeeRecoveryGauge({
               <span className="text-muted-foreground">Total Due</span>
               <span className="font-medium">{inr(total)}</span>
             </div>
-            <div className="flex justify-between">
+
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+
+            <div className="flex justify-between pt-1">
               <span className="text-muted-foreground">Remaining</span>
               <span className="font-medium text-destructive">{inr(totalDue)}</span>
             </div>
@@ -89,7 +94,10 @@ export function FeeRecoveryGauge({
         </div>
 
         <Button asChild variant="secondary" className="mt-3 w-full">
-          <Link href={`/${schoolSlug}/fees`}>View Defaulters</Link>
+          <Link href={`/${schoolSlug}/fees`}>
+            View Defaulters
+            <ArrowRight className="size-4" />
+          </Link>
         </Button>
       </CardContent>
     </Card>
