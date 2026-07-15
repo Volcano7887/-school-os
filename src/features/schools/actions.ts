@@ -107,6 +107,8 @@ export async function updateSchool(
     phone: formData.get("phone") || undefined,
     email: formData.get("email") || undefined,
     academicYearStartMonth: formData.get("academicYearStartMonth"),
+    dailyFeeTarget: formData.get("dailyFeeTarget") || undefined,
+    monthlyFeeTarget: formData.get("monthlyFeeTarget") || undefined,
   });
 
   if (!parsed.success) {
@@ -125,6 +127,14 @@ export async function updateSchool(
       phone: parsed.data.phone || null,
       email: parsed.data.email || null,
       academic_year_start_month: parsed.data.academicYearStartMonth,
+      daily_fee_target:
+        parsed.data.dailyFeeTarget !== undefined
+          ? Math.round(parsed.data.dailyFeeTarget * 100)
+          : null,
+      monthly_fee_target:
+        parsed.data.monthlyFeeTarget !== undefined
+          ? Math.round(parsed.data.monthlyFeeTarget * 100)
+          : null,
     })
     .eq("id", schoolId);
 

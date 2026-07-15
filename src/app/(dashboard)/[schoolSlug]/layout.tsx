@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserSchools } from "@/lib/school/queries";
+import { getTodayCollection } from "@/lib/dashboard/queries";
 import { AppShell } from "@/components/shared/app-shell";
 
 export default async function SchoolLayout({
@@ -34,6 +35,11 @@ export default async function SchoolLayout({
     .eq("id", user.id)
     .single();
 
+  const [{ data: schoolRow }, todayCollection] = await Promise.all([
+    supabase.from("schools").select("daily_fee_target").eq("id", activeSchool.id).single(),
+    getTodayCollection(supabase, activeSchool.id),
+  ]);
+
   return (
     <AppShell
       schools={schools}
@@ -41,6 +47,8 @@ export default async function SchoolLayout({
       userName={profile?.full_name ?? user.email ?? "Account"}
       userEmail={user.email ?? ""}
       userRole={activeSchool.role}
+      dailyFeeTarget={schoolRow?.daily_fee_target ?? null}
+      todayCollection={todayCollection}
     >
       {children}
     </AppShell>

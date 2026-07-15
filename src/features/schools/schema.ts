@@ -13,4 +13,6 @@ export const updateSchoolSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
   academicYearStartMonth: z.coerce.number().int().min(1).max(12),
+  dailyFeeTarget: z.coerce.number().min(0).optional(),
+  monthlyFeeTarget: z.coerce.number().min(0).optional(),
 });

@@ -21,7 +21,7 @@ export type NavItem = {
 
 // First 4 show in the mobile bottom nav; everything else lives behind "More".
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Command Center", href: "/dashboard", icon: LayoutDashboard },
   { label: "Fees", href: "/fees", icon: Wallet },
   { label: "Expenses", href: "/expenses", icon: Receipt },
   { label: "Students", href: "/students", icon: Users },
@@ -44,12 +44,12 @@ export type NavGroup = {
 // Sidebar-only grouping (desktop). Mobile bottom nav keeps the flat
 // NAV_ITEMS order above so its "first 4" selection doesn't shift.
 export const NAV_GROUPS: NavGroup[] = [
-  { label: "Overview", items: [NAV_ITEMS[0]] },
+  { label: "", items: [NAV_ITEMS[0]] },
   {
     label: "Finance",
     items: [NAV_ITEMS[1], NAV_ITEMS[2], NAV_ITEMS[4], NAV_ITEMS[5], NAV_ITEMS[6]],
   },
   { label: "Students", items: [NAV_ITEMS[3]] },
-  { label: "Reports", items: [NAV_ITEMS[7], NAV_ITEMS[8], NAV_ITEMS[9]] },
-  { label: "Settings", items: [NAV_ITEMS[10]] },
+  { label: "Reports", items: [NAV_ITEMS[7]] },
+  { label: "Others", items: [NAV_ITEMS[8], NAV_ITEMS[9], NAV_ITEMS[10]] },
 ];

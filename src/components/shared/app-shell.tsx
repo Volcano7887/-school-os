@@ -10,6 +10,8 @@ export function AppShell({
   userName,
   userEmail,
   userRole,
+  dailyFeeTarget,
+  todayCollection,
   children,
 }: {
   schools: UserSchool[];
@@ -17,6 +19,8 @@ export function AppShell({
   userName: string;
   userEmail: string;
   userRole: string;
+  dailyFeeTarget: number | null;
+  todayCollection: number;
   children: React.ReactNode;
 }) {
   return (
@@ -27,6 +31,8 @@ export function AppShell({
         userName={userName}
         userEmail={userEmail}
         userRole={userRole}
+        dailyFeeTarget={dailyFeeTarget}
+        todayCollection={todayCollection}
       />
       <div className="flex flex-1 flex-col">
         <Topbar userName={userName} userEmail={userEmail} userRole={userRole} />

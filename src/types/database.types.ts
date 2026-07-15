@@ -32,6 +32,8 @@ export type Database = {
           logo_url: string | null;
           academic_year_start_month: number;
           is_active: boolean;
+          daily_fee_target: number | null;
+          monthly_fee_target: number | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -47,6 +49,8 @@ export type Database = {
           logo_url?: string | null;
           academic_year_start_month?: number;
           is_active?: boolean;
+          daily_fee_target?: number | null;
+          monthly_fee_target?: number | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;

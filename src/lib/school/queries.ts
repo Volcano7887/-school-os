@@ -68,6 +68,8 @@ export type SchoolProfile = {
   phone: string | null;
   email: string | null;
   academicYearStartMonth: number;
+  dailyFeeTarget: number | null;
+  monthlyFeeTarget: number | null;
 };
 
 export async function getSchoolProfile(
@@ -76,7 +78,9 @@ export async function getSchoolProfile(
 ): Promise<SchoolProfile | null> {
   const { data, error } = await supabase
     .from("schools")
-    .select("id, name, address, phone, email, academic_year_start_month")
+    .select(
+      "id, name, address, phone, email, academic_year_start_month, daily_fee_target, monthly_fee_target"
+    )
     .eq("id", schoolId)
     .single();
 
@@ -89,5 +93,7 @@ export async function getSchoolProfile(
     phone: data.phone,
     email: data.email,
     academicYearStartMonth: data.academic_year_start_month,
+    dailyFeeTarget: data.daily_fee_target,
+    monthlyFeeTarget: data.monthly_fee_target,
   };
 }

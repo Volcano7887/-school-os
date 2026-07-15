@@ -10,6 +10,19 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
+export async function getTodayCollection(
+  supabase: SupabaseClient<Database>,
+  schoolId: string
+): Promise<number> {
+  const { data } = await supabase
+    .from("fee_payments")
+    .select("amount")
+    .eq("school_id", schoolId)
+    .eq("paid_at", todayIso());
+
+  return (data ?? []).reduce((sum, p) => sum + p.amount, 0);
+}
+
 export type DashboardStats = {
   todayCollection: number;
   todayExpenses: number;

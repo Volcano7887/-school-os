@@ -103,6 +103,41 @@ export function SettingsForm({
             </p>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="dailyFeeTarget">Daily collection goal (₹)</Label>
+              <Input
+                id="dailyFeeTarget"
+                name="dailyFeeTarget"
+                type="number"
+                min="0"
+                step="1"
+                defaultValue={
+                  school.dailyFeeTarget != null ? school.dailyFeeTarget / 100 : undefined
+                }
+                placeholder="e.g. 35000"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="monthlyFeeTarget">Monthly collection goal (₹)</Label>
+              <Input
+                id="monthlyFeeTarget"
+                name="monthlyFeeTarget"
+                type="number"
+                min="0"
+                step="1"
+                defaultValue={
+                  school.monthlyFeeTarget != null ? school.monthlyFeeTarget / 100 : undefined
+                }
+                placeholder="e.g. 1000000"
+              />
+            </div>
+          </div>
+          <p className="-mt-2 text-xs text-muted-foreground">
+            Powers the &quot;Today&apos;s Goal&quot; sidebar widget and the Monthly Collection
+            panel on the dashboard. Leave blank to hide them.
+          </p>
+
           {state.status === "error" && state.message && (
             <p className="text-sm text-destructive">{state.message}</p>
           )}

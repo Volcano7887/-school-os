@@ -17,6 +17,8 @@ export default function StyleGuideLayout({
       userName="Demo Accountant"
       userEmail="demo@example.com"
       userRole="accountant"
+      dailyFeeTarget={3500000}
+      todayCollection={2750000}
     >
       {children}
     </AppShell>
