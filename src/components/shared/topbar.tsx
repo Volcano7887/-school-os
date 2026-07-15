@@ -10,15 +10,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import type { UserSchool } from "@/lib/school/queries";
 
 export function Topbar({
   userName,
   userEmail,
   userRole,
+  schools,
+  activeSlug,
 }: {
   userName: string;
   userEmail: string;
   userRole: string;
+  schools: UserSchool[];
+  activeSlug: string;
 }) {
   return (
     <header className="hidden h-14 items-center gap-4 border-b px-6 md:flex">
@@ -52,7 +57,13 @@ export function Topbar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AccountMenu name={userName} email={userEmail} role={userRole} />
+      <AccountMenu
+        name={userName}
+        email={userEmail}
+        role={userRole}
+        schools={schools}
+        activeSlug={activeSlug}
+      />
     </header>
   );
 }

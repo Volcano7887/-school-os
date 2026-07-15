@@ -94,7 +94,6 @@ export function IncomeExpenseChart({ data }: { data: MonthlyIncomeExpense[] }) {
             name="Expense"
             stroke={EXPENSE_COLOR}
             strokeWidth={2}
-            strokeDasharray="5 4"
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
           />

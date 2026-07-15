@@ -154,6 +154,7 @@ export default async function DashboardPage({
           color="green"
           trend={trend.expenses}
           deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
+          goodDirection="down"
         />
         <StatCard
           label="Cash in Hand"

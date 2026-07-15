@@ -30,6 +30,31 @@ export async function getClasses(
   return data;
 }
 
+export type ClassWithCount = SchoolClass & { studentCount: number };
+
+export async function getClassesWithCounts(
+  supabase: SupabaseClient<Database>,
+  schoolId: string
+): Promise<ClassWithCount[]> {
+  const [classes, { data: students }] = await Promise.all([
+    getClasses(supabase, schoolId),
+    supabase
+      .from("students")
+      .select("class_id")
+      .eq("school_id", schoolId)
+      .is("deleted_at", null)
+      .eq("is_active", true),
+  ]);
+
+  const countByClassId = new Map<string, number>();
+  for (const s of students ?? []) {
+    if (!s.class_id) continue;
+    countByClassId.set(s.class_id, (countByClassId.get(s.class_id) ?? 0) + 1);
+  }
+
+  return classes.map((c) => ({ ...c, studentCount: countByClassId.get(c.id) ?? 0 }));
+}
+
 export async function getStudents(
   supabase: SupabaseClient<Database>,
   schoolId: string,

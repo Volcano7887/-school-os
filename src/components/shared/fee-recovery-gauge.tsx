@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -29,8 +30,12 @@ export function FeeRecoveryGauge({
   return (
     <Card>
       <CardContent>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <p className="font-medium">Fee Recovery</p>
+          <Info
+            className="size-3.5 text-muted-foreground"
+            aria-label="Collected vs. total due for the current academic year"
+          />
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-6">
           <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -40,7 +45,7 @@ export function FeeRecoveryGauge({
                 cy={size / 2}
                 r={radius}
                 fill="none"
-                stroke="var(--muted)"
+                stroke="var(--accent)"
                 strokeWidth={stroke}
               />
               <circle

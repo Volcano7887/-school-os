@@ -106,3 +106,37 @@ export async function getExpenseByCategoryThisMonth(
     .map(([category, amount]) => ({ category, amount }))
     .sort((a, b) => b.amount - a.amount);
 }
+
+export async function getExpenseByCategoryLast12Months(
+  supabase: SupabaseClient<Database>,
+  schoolId: string
+): Promise<ExpenseCategoryBreakdown[]> {
+  const since = new Date();
+  since.setMonth(since.getMonth() - 11);
+  since.setDate(1);
+  const sinceIso = since.toISOString().slice(0, 10);
+
+  const { data: expenses } = await supabase
+    .from("expenses")
+    .select("amount, expense_category_id")
+    .eq("school_id", schoolId)
+    .gte("expense_date", sinceIso);
+
+  if (!expenses || expenses.length === 0) return [];
+
+  const { data: categories } = await supabase
+    .from("expense_categories")
+    .select("id, name")
+    .eq("school_id", schoolId);
+  const nameById = new Map((categories ?? []).map((c) => [c.id, c.name]));
+
+  const totals = new Map<string, number>();
+  for (const e of expenses) {
+    const name = nameById.get(e.expense_category_id) ?? "Other";
+    totals.set(name, (totals.get(name) ?? 0) + e.amount);
+  }
+
+  return Array.from(totals.entries())
+    .map(([category, amount]) => ({ category, amount }))
+    .sort((a, b) => b.amount - a.amount);
+}

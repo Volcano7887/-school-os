@@ -1,7 +1,7 @@
 "use client";
 
-import { LogOut } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { ChevronDown, Check, Plus, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/features/auth/actions";
+import type { UserSchool } from "@/lib/school/queries";
 
 function initials(name: string) {
   return name
@@ -36,47 +37,64 @@ export function AccountMenu({
   name,
   email,
   role,
-  showLabel = false,
+  schools,
+  activeSlug,
 }: {
   name: string;
   email: string;
   role: string;
-  showLabel?: boolean;
+  schools: UserSchool[];
+  activeSlug: string;
 }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={cn(
-            "flex items-center gap-2 rounded-md p-1.5 text-left transition-colors",
-            showLabel
-              ? "w-full hover:bg-sidebar-accent/60"
-              : "hover:bg-muted"
-          )}
+          className="flex items-center gap-2 rounded-md p-1.5 text-left transition-colors hover:bg-muted"
         >
           <Avatar size="sm">
             <AvatarFallback>{initials(name)}</AvatarFallback>
           </Avatar>
-          {showLabel && (
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-medium text-sidebar-foreground">
-                {name}
-              </span>
-              <span className="block truncate text-xs text-sidebar-foreground/60">
-                {ROLE_LABEL[role] ?? role}
-              </span>
+          <span className="hidden min-w-0 sm:block">
+            <span className="block truncate text-sm font-medium">{name}</span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {ROLE_LABEL[role] ?? role}
             </span>
-          )}
+          </span>
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel>
           <span className="block truncate font-medium">{name}</span>
           <span className="block truncate text-xs font-normal text-muted-foreground">
             {email}
           </span>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+          Switch school
+        </DropdownMenuLabel>
+        {schools.map((school) => (
+          <DropdownMenuItem key={school.id} asChild>
+            <Link
+              href={`/${school.slug}/dashboard`}
+              className="flex w-full items-center justify-between"
+            >
+              <span className="truncate">{school.name}</span>
+              {school.slug === activeSlug && <Check className="size-4" />}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem asChild>
+          <Link href="/onboarding" className="flex w-full items-center gap-1.5">
+            <Plus className="size-4" />
+            Add school
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuSeparator />
         <form action={logout}>
           <DropdownMenuItem asChild>

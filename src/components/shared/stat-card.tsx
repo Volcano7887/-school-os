@@ -66,6 +66,7 @@ export function StatCard({
   caption,
   trend,
   deltaPercent,
+  goodDirection = "up",
 }: {
   label: string;
   value: string;
@@ -74,7 +75,14 @@ export function StatCard({
   caption?: string;
   trend?: number[];
   deltaPercent?: number;
+  /** Which direction of change is good news for this metric — e.g. Today's
+   * Expenses going down is good, so it passes "down". Only affects color;
+   * the arrow always reflects the actual direction of change. */
+  goodDirection?: "up" | "down";
 }) {
+  const isGood =
+    deltaPercent !== undefined &&
+    (goodDirection === "up" ? deltaPercent >= 0 : deltaPercent <= 0);
   return (
     <Card
       className={cn(
@@ -100,7 +108,7 @@ export function StatCard({
               <p
                 className={cn(
                   "mt-0.5 flex items-center gap-1 text-xs font-medium",
-                  deltaPercent >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                  isGood ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                 )}
               >
                 {deltaPercent >= 0 ? (

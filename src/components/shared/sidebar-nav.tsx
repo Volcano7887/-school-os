@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_GROUPS } from "@/components/shared/nav-items";
-import { SchoolSwitcher } from "@/components/shared/school-switcher";
-import type { UserSchool } from "@/lib/school/queries";
 
 function inr(paise: number) {
   return `₹${(paise / 100).toLocaleString("en-IN")}`;
@@ -59,16 +57,11 @@ function TodaysGoal({
 }
 
 export function SidebarNav({
-  schools,
   activeSlug,
   dailyFeeTarget,
   todayCollection,
 }: {
-  schools: UserSchool[];
   activeSlug: string;
-  userName: string;
-  userEmail: string;
-  userRole: string;
   dailyFeeTarget: number | null;
   todayCollection: number;
 }) {
@@ -96,12 +89,6 @@ export function SidebarNav({
           </span>
         )}
       </div>
-
-      {!collapsed && (
-        <div className="border-b border-sidebar-border p-2">
-          <SchoolSwitcher schools={schools} activeSlug={activeSlug} />
-        </div>
-      )}
 
       <nav className="flex-1 space-y-4 overflow-y-auto p-2">
         {NAV_GROUPS.map((group) => (

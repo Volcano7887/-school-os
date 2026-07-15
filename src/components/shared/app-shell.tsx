@@ -26,16 +26,18 @@ export function AppShell({
   return (
     <div className="flex min-h-screen">
       <SidebarNav
-        schools={schools}
         activeSlug={activeSlug}
-        userName={userName}
-        userEmail={userEmail}
-        userRole={userRole}
         dailyFeeTarget={dailyFeeTarget}
         todayCollection={todayCollection}
       />
       <div className="flex flex-1 flex-col">
-        <Topbar userName={userName} userEmail={userEmail} userRole={userRole} />
+        <Topbar
+          userName={userName}
+          userEmail={userEmail}
+          userRole={userRole}
+          schools={schools}
+          activeSlug={activeSlug}
+        />
         <main className="flex-1 overflow-y-auto p-4 pb-20 md:p-6 md:pb-6">
           {children}
         </main>
