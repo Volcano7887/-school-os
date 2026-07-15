@@ -33,10 +33,10 @@ export function Topbar({
         className="relative min-w-0 max-w-md flex-1 text-left"
       >
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-        <span className="flex h-9 w-full items-center overflow-hidden rounded-md border bg-muted/30 pl-9 pr-3 text-sm text-nowrap text-muted-foreground hover:bg-muted/50 lg:pr-16">
+        <span className="flex h-9 w-full items-center overflow-hidden rounded-md border bg-muted/30 pr-16 pl-9 text-sm text-nowrap text-muted-foreground hover:bg-muted/50">
           <span className="truncate">Search students, or jump to a page…</span>
         </span>
-        <kbd className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground lg:block">
+        <kbd className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 rounded border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground">
           Ctrl+K
         </kbd>
       </button>
