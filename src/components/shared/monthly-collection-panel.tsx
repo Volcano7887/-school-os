@@ -1,0 +1,78 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { MonthlyIncomeExpense } from "@/lib/dashboard/queries";
+
+function inr(paise: number) {
+  return `₹${(paise / 100).toLocaleString("en-IN")}`;
+}
+
+export function MonthlyCollectionPanel({
+  months,
+  monthlyFeeTarget,
+}: {
+  months: MonthlyIncomeExpense[];
+  monthlyFeeTarget: number | null;
+}) {
+  const [selectedIndex, setSelectedIndex] = useState(months.length - 1);
+  const selected = months[selectedIndex];
+
+  if (!monthlyFeeTarget) {
+    return null;
+  }
+
+  const collected = selected?.income ?? 0;
+  const pct = Math.min(Math.round((collected / monthlyFeeTarget) * 100), 100);
+  const remaining = Math.max(monthlyFeeTarget - collected, 0);
+
+  return (
+    <Card>
+      <CardContent className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-medium">Monthly Collection</p>
+          <Select
+            value={String(selectedIndex)}
+            onValueChange={(v) => setSelectedIndex(Number(v))}
+          >
+            <SelectTrigger className="h-8 w-36 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((m, i) => (
+                <SelectItem key={m.month} value={String(i)}>
+                  {m.month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-semibold text-primary">
+            {inr(collected)} / {inr(monthlyFeeTarget)}
+          </span>
+          <span className="font-medium">{pct}%</span>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Remaining</span>
+          <span>{inr(remaining)}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
