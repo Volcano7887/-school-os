@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database, FeeType } from "@/types/database.types";
+import type { Database, FeeType, PaymentMode } from "@/types/database.types";
 
 export type FeeStructure = {
   id: string;
@@ -73,7 +73,7 @@ export async function getStudentBalances(
   if (filters.search) studentQuery = studentQuery.ilike("full_name", `%${filters.search}%`);
   if (filters.classId) studentQuery = studentQuery.eq("class_id", filters.classId);
 
-  const [{ data: students }, { data: classes }, { data: structures }, { data: payments }] =
+  const [{ data: students }, { data: classes }, { data: structures }, { data: payments }, { data: arrears }] =
     await Promise.all([
       studentQuery,
       supabase.from("classes").select("id, name").eq("school_id", schoolId),
@@ -86,6 +86,11 @@ export async function getStudentBalances(
       supabase
         .from("fee_payments")
         .select("student_id, amount, discount_amount")
+        .eq("school_id", schoolId)
+        .eq("academic_year_id", academicYearId),
+      supabase
+        .from("student_arrears")
+        .select("student_id, amount")
         .eq("school_id", schoolId)
         .eq("academic_year_id", academicYearId),
     ]);
@@ -104,10 +109,16 @@ export async function getStudentBalances(
     );
   }
 
+  const arrearsByStudent = new Map<string, number>();
+  for (const a of arrears ?? []) {
+    arrearsByStudent.set(a.student_id, (arrearsByStudent.get(a.student_id) ?? 0) + a.amount);
+  }
+
   return students.map((s) => {
-    const totalDue = (structures ?? [])
-      .filter((fs) => fs.class_id === null || fs.class_id === s.class_id)
-      .reduce((sum, fs) => sum + fs.amount, 0);
+    const totalDue =
+      (structures ?? [])
+        .filter((fs) => fs.class_id === null || fs.class_id === s.class_id)
+        .reduce((sum, fs) => sum + fs.amount, 0) + (arrearsByStudent.get(s.id) ?? 0);
     const totalPaid = paidByStudent.get(s.id) ?? 0;
     const totalDiscount = discountByStudent.get(s.id) ?? 0;
 
@@ -238,4 +249,160 @@ export async function getFeeReceipt(
     guardianPhone: student.guardian_phone,
     schoolId,
   };
+}
+
+export type PaymentSearchResult = {
+  id: string;
+  receiptNo: string;
+  studentName: string;
+  className: string | null;
+  amount: number;
+  discountAmount: number;
+  fineAmount: number;
+  paymentMode: string;
+  paidAt: string;
+};
+
+export async function searchFeePayments(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  filters: {
+    search?: string;
+    paymentMode?: string;
+    fromDate?: string;
+    toDate?: string;
+  }
+): Promise<PaymentSearchResult[]> {
+  let query = supabase
+    .from("fee_payments")
+    .select(
+      "id, receipt_no, amount, discount_amount, fine_amount, payment_mode, paid_at, student_id"
+    )
+    .eq("school_id", schoolId)
+    .order("paid_at", { ascending: false })
+    .limit(200);
+
+  if (filters.paymentMode) query = query.eq("payment_mode", filters.paymentMode as PaymentMode);
+  if (filters.fromDate) query = query.gte("paid_at", filters.fromDate);
+  if (filters.toDate) query = query.lte("paid_at", filters.toDate);
+
+  const { data: payments, error } = await query;
+  if (error || !payments) return [];
+
+  const studentIds = [...new Set(payments.map((p) => p.student_id))];
+  const { data: students } = studentIds.length
+    ? await supabase
+        .from("students")
+        .select("id, full_name, class_id")
+        .in("id", studentIds)
+    : { data: [] as { id: string; full_name: string; class_id: string | null }[] };
+
+  const classIds = [...new Set((students ?? []).map((s) => s.class_id).filter(Boolean))] as string[];
+  const { data: classes } = classIds.length
+    ? await supabase.from("classes").select("id, name").in("id", classIds)
+    : { data: [] as { id: string; name: string }[] };
+  const classNameById = new Map((classes ?? []).map((c) => [c.id, c.name]));
+
+  const studentById = new Map((students ?? []).map((s) => [s.id, s]));
+
+  let results = payments.map((p) => {
+    const student = studentById.get(p.student_id);
+    return {
+      id: p.id,
+      receiptNo: p.receipt_no,
+      studentName: student?.full_name ?? "Unknown",
+      className: student?.class_id ? (classNameById.get(student.class_id) ?? null) : null,
+      amount: p.amount,
+      discountAmount: p.discount_amount,
+      fineAmount: p.fine_amount,
+      paymentMode: p.payment_mode,
+      paidAt: p.paid_at,
+    };
+  });
+
+  if (filters.search) {
+    const q = filters.search.trim().toLowerCase();
+    results = results.filter(
+      (r) =>
+        r.studentName.toLowerCase().includes(q) || r.receiptNo.toLowerCase().includes(q)
+    );
+  }
+
+  return results;
+}
+
+export type DiscountedPayment = {
+  id: string;
+  receiptNo: string;
+  studentName: string;
+  discountAmount: number;
+  paidAt: string;
+};
+
+export async function getDiscountedPayments(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  academicYearId: string
+): Promise<DiscountedPayment[]> {
+  const { data: payments, error } = await supabase
+    .from("fee_payments")
+    .select("id, receipt_no, discount_amount, paid_at, student_id")
+    .eq("school_id", schoolId)
+    .eq("academic_year_id", academicYearId)
+    .gt("discount_amount", 0)
+    .order("paid_at", { ascending: false });
+
+  if (error || !payments) return [];
+
+  const studentIds = [...new Set(payments.map((p) => p.student_id))];
+  const { data: students } = studentIds.length
+    ? await supabase.from("students").select("id, full_name").in("id", studentIds)
+    : { data: [] as { id: string; full_name: string }[] };
+  const nameById = new Map((students ?? []).map((s) => [s.id, s.full_name]));
+
+  return payments.map((p) => ({
+    id: p.id,
+    receiptNo: p.receipt_no,
+    studentName: nameById.get(p.student_id) ?? "Unknown",
+    discountAmount: p.discount_amount,
+    paidAt: p.paid_at,
+  }));
+}
+
+export type CarryForwardCandidate = {
+  studentId: string;
+  fullName: string;
+  className: string | null;
+  balance: number;
+  alreadyCarried: boolean;
+};
+
+export async function getCarryForwardCandidates(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  sourceAcademicYearId: string,
+  targetAcademicYearId: string
+): Promise<CarryForwardCandidate[]> {
+  const [balances, { data: existing }] = await Promise.all([
+    getStudentBalances(supabase, schoolId, sourceAcademicYearId, {}),
+    supabase
+      .from("student_arrears")
+      .select("student_id")
+      .eq("school_id", schoolId)
+      .eq("academic_year_id", targetAcademicYearId)
+      .eq("source_academic_year_id", sourceAcademicYearId),
+  ]);
+
+  const carriedStudentIds = new Set((existing ?? []).map((e) => e.student_id));
+
+  return balances
+    .filter((b) => b.balance > 0)
+    .map((b) => ({
+      studentId: b.studentId,
+      fullName: b.fullName,
+      className: b.className,
+      balance: b.balance,
+      alreadyCarried: carriedStudentIds.has(b.studentId),
+    }))
+    .sort((a, b) => b.balance - a.balance);
 }

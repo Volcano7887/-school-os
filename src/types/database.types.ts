@@ -121,6 +121,30 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["academic_years"]["Insert"]>;
         Relationships: [];
       };
+      student_arrears: {
+        Row: {
+          id: string;
+          school_id: string;
+          student_id: string;
+          academic_year_id: string;
+          source_academic_year_id: string;
+          amount: number;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          student_id: string;
+          academic_year_id: string;
+          source_academic_year_id: string;
+          amount: number;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["student_arrears"]["Insert"]>;
+        Relationships: [];
+      };
       classes: {
         Row: {
           id: string;

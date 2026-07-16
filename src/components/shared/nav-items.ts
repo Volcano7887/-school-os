@@ -13,6 +13,13 @@ import {
   Paperclip,
   History,
   Settings,
+  Search,
+  AlertCircle,
+  Zap,
+  Tag,
+  Percent,
+  CornerDownRight,
+  BellRing,
 } from "lucide-react";
 
 export type NavItem = {
@@ -22,7 +29,14 @@ export type NavItem = {
 };
 
 const COMMAND_CENTER: NavItem = { label: "Command Center", href: "/dashboard", icon: LayoutDashboard };
-const FEES: NavItem = { label: "Fees", href: "/fees", icon: Wallet };
+const COLLECT_FEES: NavItem = { label: "Collect Fees", href: "/fees", icon: Wallet };
+const SEARCH_FEES_PAYMENT: NavItem = { label: "Search Fees Payment", href: "/fees/search-payments", icon: Search };
+const SEARCH_DUE_FEES: NavItem = { label: "Search Due Fees", href: "/fees/due", icon: AlertCircle };
+const QUICK_FEES: NavItem = { label: "Quick Fees", href: "/fees/quick", icon: Zap };
+const FEES_TYPE: NavItem = { label: "Fees Type", href: "/fees/types", icon: Tag };
+const FEES_DISCOUNT: NavItem = { label: "Fees Discount", href: "/fees/discounts", icon: Percent };
+const FEES_CARRY_FORWARD: NavItem = { label: "Fees Carry Forward", href: "/fees/carry-forward", icon: CornerDownRight };
+const FEES_REMINDER: NavItem = { label: "Fees Reminder", href: "/fees/reminders", icon: BellRing };
 const EXPENSES: NavItem = { label: "Expenses", href: "/expenses", icon: Receipt };
 const STUDENTS: NavItem = { label: "Students", href: "/students", icon: Users };
 const CLASSES: NavItem = { label: "Classes", href: "/classes", icon: GraduationCap };
@@ -36,11 +50,11 @@ const AUDIT_LOG: NavItem = { label: "Audit Log", href: "/audit-log", icon: Histo
 const SETTINGS: NavItem = { label: "Settings", href: "/settings", icon: Settings };
 
 // First 4 show in the mobile bottom nav; everything else lives behind "More".
-// Order here is the mobile order — Classes/Analytics are appended at the end
-// so they don't shift which 4 items mobile shows.
+// Order here is the mobile order — new fee sub-pages are appended at the
+// end so they don't shift which 4 items mobile shows.
 export const NAV_ITEMS: NavItem[] = [
   COMMAND_CENTER,
-  FEES,
+  COLLECT_FEES,
   EXPENSES,
   STUDENTS,
   SALARY,
@@ -52,6 +66,13 @@ export const NAV_ITEMS: NavItem[] = [
   SETTINGS,
   CLASSES,
   ANALYTICS,
+  SEARCH_FEES_PAYMENT,
+  SEARCH_DUE_FEES,
+  QUICK_FEES,
+  FEES_TYPE,
+  FEES_DISCOUNT,
+  FEES_CARRY_FORWARD,
+  FEES_REMINDER,
 ];
 
 export const MOBILE_PRIMARY_COUNT = 4;
@@ -65,7 +86,20 @@ export type NavGroup = {
 // mobile bottom nav's flat order above.
 export const NAV_GROUPS: NavGroup[] = [
   { label: "", items: [COMMAND_CENTER] },
-  { label: "Finance", items: [FEES, EXPENSES, SALARY, CASH_BOOK, LEDGER] },
+  {
+    label: "Fees Collection",
+    items: [
+      COLLECT_FEES,
+      SEARCH_FEES_PAYMENT,
+      SEARCH_DUE_FEES,
+      QUICK_FEES,
+      FEES_TYPE,
+      FEES_DISCOUNT,
+      FEES_CARRY_FORWARD,
+      FEES_REMINDER,
+    ],
+  },
+  { label: "Finance", items: [EXPENSES, SALARY, CASH_BOOK, LEDGER] },
   { label: "Students", items: [STUDENTS, CLASSES] },
   { label: "Reports", items: [REPORTS, ANALYTICS] },
   { label: "Others", items: [BILLS, AUDIT_LOG, SETTINGS] },

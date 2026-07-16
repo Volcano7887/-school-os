@@ -111,3 +111,40 @@ export async function recordFeePayment(
     data: { paymentId: data.id },
   };
 }
+
+export async function carryForwardArrears(
+  schoolSlug: string,
+  studentId: string,
+  amount: number,
+  sourceAcademicYearId: string,
+  targetAcademicYearId: string
+): Promise<ActionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { status: "error", message: "Not signed in." };
+
+  const schoolId = await getSchoolIdBySlug(supabase, schoolSlug);
+  if (!schoolId) return { status: "error", message: "School not found." };
+
+  const { error } = await supabase.from("student_arrears").insert({
+    school_id: schoolId,
+    student_id: studentId,
+    academic_year_id: targetAcademicYearId,
+    source_academic_year_id: sourceAcademicYearId,
+    amount,
+    created_by: user.id,
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.code === "23505" ? "Already carried forward." : "Couldn't carry forward this balance.",
+    };
+  }
+
+  revalidatePath(`/${schoolSlug}/fees/carry-forward`);
+  revalidatePath(`/${schoolSlug}/fees`);
+  return { status: "success" };
+}

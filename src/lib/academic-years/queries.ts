@@ -31,3 +31,28 @@ export async function getCurrentAcademicYear(
     isCurrent: data.is_current,
   };
 }
+
+export async function getPreviousAcademicYear(
+  supabase: SupabaseClient<Database>,
+  schoolId: string,
+  beforeStartDate: string
+): Promise<AcademicYear | null> {
+  const { data, error } = await supabase
+    .from("academic_years")
+    .select("id, name, start_date, end_date, is_current")
+    .eq("school_id", schoolId)
+    .lt("start_date", beforeStartDate)
+    .order("start_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  return {
+    id: data.id,
+    name: data.name,
+    startDate: data.start_date,
+    endDate: data.end_date,
+    isCurrent: data.is_current,
+  };
+}
