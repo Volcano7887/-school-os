@@ -77,25 +77,27 @@ export function SidebarNav({
     });
   }
 
-  // Default (no manual choice yet): icon-only for md–xl (tablet widths),
-  // full labels at xl+. `override` lets the button force either state at
-  // ANY width — previously the button only ever added "hidden", so on
-  // tablet (below xl) clicking "expand" looked like it did nothing, since
-  // the xl: gate silently overrode it. Now override always wins.
+  // Breakpoint system: md=768 (tablet starts), lg=1024 (desktop starts,
+  // matches the product's stated Tablet 768–1023 / Desktop 1024+ ranges).
+  // Default (no manual choice yet): icon-only for the tablet range
+  // (md–lg), full labels from lg (desktop) up. `override` lets the button
+  // force either state at ANY width — previously it only ever added
+  // "hidden", so on tablet clicking "expand" looked like a no-op since
+  // the breakpoint gate silently overrode it. Now override always wins.
   const [override, setOverride] = useState<boolean | null>(null);
 
   const collapsed = override === false;
-  const blockLabel = override === true ? "block" : override === false ? "hidden" : "hidden xl:block";
+  const blockLabel = override === true ? "block" : override === false ? "hidden" : "hidden lg:block";
   const inlineLabel =
-    override === true ? "inline" : override === false ? "hidden" : "hidden xl:inline";
+    override === true ? "inline" : override === false ? "hidden" : "hidden lg:inline";
   const widthClass =
-    override === true ? "md:w-60" : override === false ? "md:w-16" : "md:w-16 xl:w-60";
+    override === true ? "md:w-60" : override === false ? "md:w-16" : "md:w-16 lg:w-60";
   const justifyClass =
     override === true
       ? "justify-start"
       : override === false
         ? "justify-center"
-        : "justify-center xl:justify-start";
+        : "justify-center lg:justify-start";
 
   function toggleCollapsed() {
     if (override !== null) {
@@ -103,9 +105,9 @@ export function SidebarNav({
       return;
     }
     // No manual choice yet — figure out what's currently showing (depends
-    // on viewport, since below xl it's icon-only by default) and flip that.
-    const isXlUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches;
-    setOverride(!isXlUp);
+    // on viewport, since below lg it's icon-only by default) and flip that.
+    const isLgUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
+    setOverride(!isLgUp);
   }
 
   return (
