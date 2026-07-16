@@ -101,7 +101,7 @@ export function StatCard({
             <Icon className="size-5.5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-muted-foreground">{label}</p>
+            <p className="text-sm leading-tight text-muted-foreground">{label}</p>
             <p className="text-2xl font-bold">{value}</p>
             {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
             {deltaPercent !== undefined && (

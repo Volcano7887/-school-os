@@ -141,48 +141,44 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      {/* Row: KPI cards + AI Insight share the FULL dashboard width (not
-          confined to the narrower main column below) — matches the
-          reference mockup, and gives each stat card enough room to not
-          clip its label. Container query, not a viewport breakpoint,
-          since this row's width is the same regardless of screen size
-          once the sidebar is accounted for. */}
-      <div className="@container">
-        <div className="flex flex-col gap-6 @5xl:flex-row">
-          <div className="grid flex-1 gap-6 @sm:grid-cols-2 @lg:grid-cols-4">
-            <StatCard
-              label="Today's Collection"
-              value={inr(stats.todayCollection)}
-              icon={Wallet}
-              color="purple"
-              trend={trend.collection}
-              deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
-            />
-            <StatCard
-              label="Today's Expenses"
-              value={inr(stats.todayExpenses)}
-              icon={TrendingDown}
-              color="green"
-              trend={trend.expenses}
-              deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
-              goodDirection="down"
-            />
-            <StatCard
-              label="Cash in Hand"
-              value={inr(stats.cashInHand)}
-              icon={TrendingUp}
-              color="orange"
-            />
-            <StatCard
-              label="Pending Fees"
-              value={inr(stats.pendingFees)}
-              icon={Clock}
-              color="red"
-            />
-          </div>
-          <div className="@5xl:w-80 @5xl:shrink-0">
-            <AiInsightCard />
-          </div>
+      {/* Row: KPI cards + AI Insight, side by side at every width — same
+          structure as desktop always, no reflow. Cards handle tight space
+          by letting the label wrap to two lines (see StatCard), not by
+          the layout changing shape. */}
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="grid flex-1 grid-cols-2 gap-6 lg:grid-cols-4">
+          <StatCard
+            label="Today's Collection"
+            value={inr(stats.todayCollection)}
+            icon={Wallet}
+            color="purple"
+            trend={trend.collection}
+            deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
+          />
+          <StatCard
+            label="Today's Expenses"
+            value={inr(stats.todayExpenses)}
+            icon={TrendingDown}
+            color="green"
+            trend={trend.expenses}
+            deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
+            goodDirection="down"
+          />
+          <StatCard
+            label="Cash in Hand"
+            value={inr(stats.cashInHand)}
+            icon={TrendingUp}
+            color="orange"
+          />
+          <StatCard
+            label="Pending Fees"
+            value={inr(stats.pendingFees)}
+            icon={Clock}
+            color="red"
+          />
+        </div>
+        <div className="lg:w-80 lg:shrink-0">
+          <AiInsightCard />
         </div>
       </div>
 
