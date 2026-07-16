@@ -286,6 +286,8 @@ export type Database = {
           paid_at: string;
           recorded_by: string;
           journal_entry_id: string | null;
+          discount_amount: number;
+          fine_amount: number;
           created_at: string;
         };
         Insert: {
@@ -302,6 +304,8 @@ export type Database = {
           paid_at?: string;
           recorded_by: string;
           journal_entry_id?: string | null;
+          discount_amount?: number;
+          fine_amount?: number;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["fee_payments"]["Insert"]>;
@@ -504,6 +508,8 @@ export type Database = {
           p_period_label: string | null;
           p_remarks: string | null;
           p_recorded_by: string;
+          p_discount_amount?: number;
+          p_fine_amount?: number;
         };
         Returns: Database["public"]["Tables"]["fee_payments"]["Row"];
       };

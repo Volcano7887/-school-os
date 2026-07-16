@@ -50,6 +50,7 @@ export type StudentBalance = {
   admissionNo: string | null;
   totalDue: number;
   totalPaid: number;
+  totalDiscount: number;
   balance: number;
   guardianName: string | null;
   guardianPhone: string | null;
@@ -84,7 +85,7 @@ export async function getStudentBalances(
         .eq("is_active", true),
       supabase
         .from("fee_payments")
-        .select("student_id, amount")
+        .select("student_id, amount, discount_amount")
         .eq("school_id", schoolId)
         .eq("academic_year_id", academicYearId),
     ]);
@@ -94,8 +95,13 @@ export async function getStudentBalances(
   const classNameById = new Map((classes ?? []).map((c) => [c.id, c.name]));
 
   const paidByStudent = new Map<string, number>();
+  const discountByStudent = new Map<string, number>();
   for (const p of payments ?? []) {
     paidByStudent.set(p.student_id, (paidByStudent.get(p.student_id) ?? 0) + p.amount);
+    discountByStudent.set(
+      p.student_id,
+      (discountByStudent.get(p.student_id) ?? 0) + p.discount_amount
+    );
   }
 
   return students.map((s) => {
@@ -103,6 +109,7 @@ export async function getStudentBalances(
       .filter((fs) => fs.class_id === null || fs.class_id === s.class_id)
       .reduce((sum, fs) => sum + fs.amount, 0);
     const totalPaid = paidByStudent.get(s.id) ?? 0;
+    const totalDiscount = discountByStudent.get(s.id) ?? 0;
 
     return {
       studentId: s.id,
@@ -111,7 +118,8 @@ export async function getStudentBalances(
       admissionNo: s.admission_no,
       totalDue,
       totalPaid,
-      balance: totalDue - totalPaid,
+      totalDiscount,
+      balance: totalDue - totalPaid - totalDiscount,
       guardianName: s.guardian_name,
       guardianPhone: s.guardian_phone,
     };
@@ -126,6 +134,8 @@ export type FeePaymentRecord = {
   paidAt: string;
   periodLabel: string | null;
   remarks: string | null;
+  discountAmount: number;
+  fineAmount: number;
 };
 
 export async function getStudentPayments(
@@ -136,7 +146,9 @@ export async function getStudentPayments(
 ): Promise<FeePaymentRecord[]> {
   const { data, error } = await supabase
     .from("fee_payments")
-    .select("id, receipt_no, amount, payment_mode, paid_at, period_label, remarks")
+    .select(
+      "id, receipt_no, amount, payment_mode, paid_at, period_label, remarks, discount_amount, fine_amount"
+    )
     .eq("school_id", schoolId)
     .eq("student_id", studentId)
     .eq("academic_year_id", academicYearId)
@@ -152,6 +164,8 @@ export async function getStudentPayments(
     paidAt: p.paid_at,
     periodLabel: p.period_label,
     remarks: p.remarks,
+    discountAmount: p.discount_amount,
+    fineAmount: p.fine_amount,
   }));
 }
 
@@ -162,6 +176,8 @@ export type FeeReceipt = {
   paidAt: string;
   periodLabel: string | null;
   remarks: string | null;
+  discountAmount: number;
+  fineAmount: number;
   studentName: string;
   className: string | null;
   admissionNo: string | null;
@@ -178,7 +194,9 @@ export async function getFeeReceipt(
 ): Promise<FeeReceipt | null> {
   const { data: payment, error } = await supabase
     .from("fee_payments")
-    .select("receipt_no, amount, payment_mode, paid_at, period_label, remarks, student_id")
+    .select(
+      "receipt_no, amount, payment_mode, paid_at, period_label, remarks, student_id, discount_amount, fine_amount"
+    )
     .eq("school_id", schoolId)
     .eq("id", paymentId)
     .single();
@@ -210,6 +228,8 @@ export async function getFeeReceipt(
     paidAt: payment.paid_at,
     periodLabel: payment.period_label,
     remarks: payment.remarks,
+    discountAmount: payment.discount_amount,
+    fineAmount: payment.fine_amount,
     studentName: student.full_name,
     className,
     admissionNo: student.admission_no,

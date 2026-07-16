@@ -47,6 +47,8 @@ export function FeeCollectionPanel({
   onDone: () => void;
 }) {
   const [amount, setAmount] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [fine, setFine] = useState(0);
   const router = useRouter();
   const printAfterSave = useRef(false);
   const action = recordFeePayment.bind(null, schoolSlug);
@@ -77,7 +79,9 @@ export function FeeCollectionPanel({
   }, [state.status, state.message, state.data, router, schoolSlug, onDone]);
 
   const amountPaise = Math.round((amount || 0) * 100);
-  const previewBalance = student.balance - amountPaise;
+  const discountPaise = Math.round((discount || 0) * 100);
+  const finePaise = Math.round((fine || 0) * 100);
+  const previewBalance = student.balance - amountPaise - discountPaise;
 
   return (
     <Card>
@@ -175,6 +179,41 @@ export function FeeCollectionPanel({
               </div>
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="discountAmount">Discount (₹, optional)</Label>
+                <Input
+                  id="discountAmount"
+                  name="discountAmount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={discount || ""}
+                  onChange={(e) => setDiscount(Number(e.target.value))}
+                  placeholder="0"
+                />
+                {state.fieldErrors?.discountAmount && (
+                  <p className="text-sm text-destructive">{state.fieldErrors.discountAmount[0]}</p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="fineAmount">Late Fine (₹, optional)</Label>
+                <Input
+                  id="fineAmount"
+                  name="fineAmount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={fine || ""}
+                  onChange={(e) => setFine(Number(e.target.value))}
+                  placeholder="0"
+                />
+                {state.fieldErrors?.fineAmount && (
+                  <p className="text-sm text-destructive">{state.fieldErrors.fineAmount[0]}</p>
+                )}
+              </div>
+            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="periodLabel">Period (optional)</Label>
               <Input id="periodLabel" name="periodLabel" placeholder="e.g. June, Term 1" />
@@ -204,6 +243,18 @@ export function FeeCollectionPanel({
               <span className="text-muted-foreground">Amount Received</span>
               <span>{inr(amountPaise)}</span>
             </div>
+            {discountPaise > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Discount</span>
+                <span className="text-green-600 dark:text-green-400">-{inr(discountPaise)}</span>
+              </div>
+            )}
+            {finePaise > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Late Fine</span>
+                <span className="text-destructive">+{inr(finePaise)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-medium">
               <span>{previewBalance < 0 ? "Advance" : "Balance"}</span>
               <span>{inr(Math.abs(previewBalance))}</span>

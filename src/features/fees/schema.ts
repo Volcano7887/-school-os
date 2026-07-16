@@ -15,4 +15,6 @@ export const feePaymentSchema = z.object({
   paidAt: z.string().min(1, "Date is required"),
   periodLabel: z.string().optional(),
   remarks: z.string().optional(),
+  discountAmount: z.coerce.number().min(0).optional(),
+  fineAmount: z.coerce.number().min(0).optional(),
 });

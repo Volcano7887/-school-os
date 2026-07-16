@@ -62,6 +62,8 @@ export async function recordFeePayment(
     paidAt: formData.get("paidAt"),
     periodLabel: formData.get("periodLabel") || undefined,
     remarks: formData.get("remarks") || undefined,
+    discountAmount: formData.get("discountAmount") || undefined,
+    fineAmount: formData.get("fineAmount") || undefined,
   });
 
   if (!parsed.success) {
@@ -93,6 +95,8 @@ export async function recordFeePayment(
     p_period_label: parsed.data.periodLabel || null,
     p_remarks: parsed.data.remarks || null,
     p_recorded_by: user.id,
+    p_discount_amount: Math.round((parsed.data.discountAmount ?? 0) * 100),
+    p_fine_amount: Math.round((parsed.data.fineAmount ?? 0) * 100),
   });
 
   if (error || !data) {

@@ -171,6 +171,8 @@ export default async function StudentProfilePage({
                     <TableHead>Date</TableHead>
                     <TableHead>Receipt No.</TableHead>
                     <TableHead>Amount</TableHead>
+                    <TableHead>Discount</TableHead>
+                    <TableHead>Fine</TableHead>
                     <TableHead>Mode</TableHead>
                     <TableHead>Remarks</TableHead>
                     <TableHead></TableHead>
@@ -182,6 +184,22 @@ export default async function StudentProfilePage({
                       <TableCell>{formatDate(p.paidAt)}</TableCell>
                       <TableCell className="font-medium">{p.receiptNo}</TableCell>
                       <TableCell>{inr(p.amount)}</TableCell>
+                      <TableCell>
+                        {p.discountAmount > 0 ? (
+                          <span className="text-green-600 dark:text-green-400">
+                            -{inr(p.discountAmount)}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {p.fineAmount > 0 ? (
+                          <span className="text-destructive">+{inr(p.fineAmount)}</span>
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
                       <TableCell>{PAYMENT_MODE_LABEL[p.paymentMode]}</TableCell>
                       <TableCell>{p.remarks ?? p.periodLabel ?? "—"}</TableCell>
                       <TableCell>

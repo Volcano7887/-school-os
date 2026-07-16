@@ -124,11 +124,38 @@ export default async function FeeReceiptPage({
           <Separator />
 
           <div className="flex items-center justify-between">
-            <span className="font-medium">Amount Received</span>
+            <span className="font-medium">Fee Amount</span>
             <span className="text-xl font-semibold">
               ₹{(receipt.amount / 100).toLocaleString("en-IN")}
             </span>
           </div>
+
+          {receipt.discountAmount > 0 && (
+            <div className="flex items-center justify-between text-sm text-green-600 dark:text-green-400">
+              <span>Discount</span>
+              <span>-₹{(receipt.discountAmount / 100).toLocaleString("en-IN")}</span>
+            </div>
+          )}
+
+          {receipt.fineAmount > 0 && (
+            <div className="flex items-center justify-between text-sm text-destructive">
+              <span>Late Fine</span>
+              <span>+₹{(receipt.fineAmount / 100).toLocaleString("en-IN")}</span>
+            </div>
+          )}
+
+          {(receipt.discountAmount > 0 || receipt.fineAmount > 0) && (
+            <div className="flex items-center justify-between font-medium">
+              <span>Total Collected</span>
+              <span>
+                ₹
+                {(
+                  (receipt.amount + receipt.fineAmount) /
+                  100
+                ).toLocaleString("en-IN")}
+              </span>
+            </div>
+          )}
 
           {receipt.remarks && (
             <p className="text-sm text-muted-foreground">Remarks: {receipt.remarks}</p>
