@@ -61,6 +61,32 @@ export async function getUserRole(
   return data.role;
 }
 
+export type SchoolMember = {
+  userId: string;
+  email: string;
+  fullName: string | null;
+  role: SchoolRole;
+  isActive: boolean;
+  createdAt: string;
+};
+
+export async function getSchoolMembers(
+  supabase: SupabaseClient<Database>,
+  schoolId: string
+): Promise<SchoolMember[]> {
+  const { data, error } = await supabase.rpc("get_school_members", { p_school_id: schoolId });
+  if (error || !data) return [];
+
+  return data.map((m) => ({
+    userId: m.user_id,
+    email: m.email,
+    fullName: m.full_name,
+    role: m.role,
+    isActive: m.is_active,
+    createdAt: m.created_at,
+  }));
+}
+
 // RLS (schools_select: is_school_member OR created_by = auth.uid()) does the
 // authorization here — this simply returns null if the caller isn't
 // permitted to see the school, same as if it didn't exist.

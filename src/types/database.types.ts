@@ -573,6 +573,21 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["cash_handovers"]["Row"];
       };
+      get_school_members: {
+        Args: { p_school_id: string };
+        Returns: {
+          user_id: string;
+          email: string;
+          full_name: string | null;
+          role: SchoolRole;
+          is_active: boolean;
+          created_at: string;
+        }[];
+      };
+      get_user_id_by_email: {
+        Args: { p_email: string };
+        Returns: string | null;
+      };
     };
     Enums: {
       school_role: SchoolRole;
