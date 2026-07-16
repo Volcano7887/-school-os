@@ -62,10 +62,15 @@ export function SidebarNav({
   todayCollection: number;
 }) {
   const pathname = usePathname();
-  // Same full sidebar at every width from md up — only the manual toggle
-  // collapses it to icon-only. No tablet-specific auto-collapse: the goal
-  // is the same desktop look everywhere, not a distinct tablet layout.
+  // Icon-only for md–xl (covers tablet widths, e.g. an 11" iPad landscape
+  // at ~1194px) — there isn't room there for both a labeled sidebar and a
+  // full-size KPI row + AI Insight side by side. Full labels return at
+  // xl (1280px) and up, matching typical desktop widths. The manual
+  // toggle forces icon-only at any width ≥ md, same as before.
   const [collapsed, setCollapsed] = useState(false);
+
+  const blockLabel = collapsed ? "hidden" : "hidden xl:block";
+  const inlineLabel = collapsed ? "hidden" : "hidden xl:inline";
 
   function toggleCollapsed() {
     setCollapsed((prev) => !prev);
@@ -75,25 +80,28 @@ export function SidebarNav({
     <aside
       className={cn(
         "hidden md:flex md:flex-col md:border-r md:border-sidebar-border md:bg-sidebar",
-        collapsed ? "md:w-16" : "md:w-60"
+        collapsed ? "md:w-16" : "md:w-16 xl:w-60"
       )}
     >
       <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-3">
         <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
           <CheckCheck className="size-4" />
         </div>
-        {!collapsed && (
-          <span className="truncate px-1 text-sm font-semibold text-sidebar-foreground">
-            School OS
-          </span>
-        )}
+        <span className={cn("truncate px-1 text-sm font-semibold text-sidebar-foreground", blockLabel)}>
+          School OS
+        </span>
       </div>
 
       <nav className="flex-1 space-y-4 overflow-y-auto p-2">
         {NAV_GROUPS.map((group) => (
           <div key={group.label || "primary"} className="space-y-1">
-            {group.label && !collapsed && (
-              <p className="px-3 text-[11px] font-semibold tracking-wide text-sidebar-foreground/40 uppercase">
+            {group.label && (
+              <p
+                className={cn(
+                  "px-3 text-[11px] font-semibold tracking-wide text-sidebar-foreground/40 uppercase",
+                  blockLabel
+                )}
+              >
                 {group.label}
               </p>
             )}
@@ -107,14 +115,14 @@ export function SidebarNav({
                   title={collapsed ? item.label : undefined}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                    collapsed && "justify-center",
+                    collapsed ? "justify-center" : "justify-center xl:justify-start",
                     active
                       ? "bg-sidebar-accent text-sidebar-accent-foreground"
                       : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <item.icon className="size-[18px] shrink-0" strokeWidth={2.25} />
-                  {!collapsed && item.label}
+                  <span className={inlineLabel}>{item.label}</span>
                 </Link>
               );
             })}
@@ -123,24 +131,27 @@ export function SidebarNav({
       </nav>
 
       <div className="space-y-2 border-t border-sidebar-border p-2">
-        {!collapsed && (
+        <div className={blockLabel}>
           <TodaysGoal
             activeSlug={activeSlug}
             dailyFeeTarget={dailyFeeTarget}
             todayCollection={todayCollection}
           />
-        )}
+        </div>
         <button
           type="button"
           onClick={toggleCollapsed}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+          className={cn(
+            "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+            collapsed ? "justify-center" : "justify-center xl:justify-start"
+          )}
         >
           {collapsed ? (
             <ChevronsRight className="size-4 shrink-0" />
           ) : (
             <>
               <ChevronsLeft className="size-4 shrink-0" />
-              Collapse
+              <span className={inlineLabel}>Collapse</span>
             </>
           )}
         </button>
