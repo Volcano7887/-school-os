@@ -85,24 +85,30 @@ export function StatCard({
     (goodDirection === "up" ? deltaPercent >= 0 : deltaPercent <= 0);
   return (
     <Card
+      size="sm"
       className={cn(
-        "overflow-hidden bg-gradient-to-br shadow-sm",
+        "@container overflow-hidden bg-gradient-to-br shadow-sm",
         GRADIENTS[color]
       )}
     >
-      <CardContent>
-        <div className="flex items-start gap-3">
+      <CardContent className="px-3 @[220px]:px-6">
+        <div className="flex items-start gap-1.5 @[220px]:gap-3">
           <div
             className={cn(
-              "flex size-11 shrink-0 items-center justify-center rounded-full",
+              "flex size-7 shrink-0 items-center justify-center rounded-full @[220px]:size-11",
               ICON_COLORS[color]
             )}
           >
-            <Icon className="size-5.5" />
+            <Icon className="size-3.5 @[220px]:size-5.5" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm leading-tight text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold">{value}</p>
+            {/* Value font shrinks when the CARD ITSELF is narrow (container
+                query, not viewport) — this is the one thing on the card
+                that must never clip: a bold 24px number needs ~115px for
+                something like "₹4,63,100", which a ~160px-wide card simply
+                doesn't have at the default size. */}
+            <p className="text-base font-bold @[220px]:text-2xl">{value}</p>
             {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
             {deltaPercent !== undefined && (
               <p
