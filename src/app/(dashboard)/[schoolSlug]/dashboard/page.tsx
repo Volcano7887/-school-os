@@ -121,30 +121,35 @@ export default async function DashboardPage({
         <QuickActionMenu schoolSlug={schoolSlug} />
       </div>
 
-      {/* Main column (left, 2/3) + right rail — a persistent two-column
-          split, not row-by-row grids, so the rail runs alongside the main
-          column instead of interleaving with it. */}
+      {/* Status banner is intentionally only as wide as the main column
+          below (2/3), not the full page — it shouldn't run under where
+          AI Insight sits. Rendered as its own single-cell grid row so its
+          width matches that column exactly. */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="@container space-y-6 lg:col-span-2">
-          <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm">
-            <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
-              <CheckCircle2 className="size-4" />
-              Everything looks good today.
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm lg:col-span-2">
+          <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+            <CheckCircle2 className="size-4" />
+            Everything looks good today.
+          </span>
+          {alerts.length > 0 && (
+            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+              <Clock className="size-4" />
+              {alerts.length} {alerts.length === 1 ? "item requires" : "items require"} your
+              attention.
             </span>
-            {alerts.length > 0 && (
-              <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                <Clock className="size-4" />
-                {alerts.length} {alerts.length === 1 ? "item requires" : "items require"} your
-                attention.
-              </span>
-            )}
-          </div>
+          )}
+        </div>
+      </div>
 
-          {/* Container queries, not viewport breakpoints — this column's
-              actual width depends on whether the right rail is present,
-              not just the screen size, so lg:/xl: alone can't tell it
-              apart from a full-width layout. */}
-          <div className="grid gap-6 @sm:grid-cols-2 @2xl:grid-cols-4">
+      {/* Row: KPI cards + AI Insight share the FULL dashboard width (not
+          confined to the narrower main column below) — matches the
+          reference mockup, and gives each stat card enough room to not
+          clip its label. Container query, not a viewport breakpoint,
+          since this row's width is the same regardless of screen size
+          once the sidebar is accounted for. */}
+      <div className="@container">
+        <div className="flex flex-col gap-6 @3xl:flex-row">
+          <div className="grid flex-1 gap-6 @sm:grid-cols-2 @lg:grid-cols-4">
             <StatCard
               label="Today's Collection"
               value={inr(stats.todayCollection)}
@@ -175,7 +180,17 @@ export default async function DashboardPage({
               color="red"
             />
           </div>
+          <div className="@3xl:w-80 @3xl:shrink-0">
+            <AiInsightCard />
+          </div>
+        </div>
+      </div>
 
+      {/* Main column (left, 2/3) + right rail — a persistent two-column
+          split, not row-by-row grids, so the rail runs alongside the main
+          column instead of interleaving with it. */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>6 Month Cash Flow</CardTitle>
@@ -219,7 +234,6 @@ export default async function DashboardPage({
         </div>
 
         <div className="space-y-6">
-          <AiInsightCard />
           <MonthlyCollectionPanel
             schoolSlug={schoolSlug}
             months={chartData}
