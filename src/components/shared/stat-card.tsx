@@ -91,7 +91,12 @@ export function StatCard({
         GRADIENTS[color]
       )}
     >
-      <CardContent className="px-3 @[220px]:px-6">
+      {/* h-full + justify-center: cards in the same grid row stretch to
+          match the tallest one (some have a delta/sparkline, some don't) —
+          without this, a short-content card ends up with its icon/text
+          pinned to the top and a big dead gap below instead of looking
+          intentional. */}
+      <CardContent className="flex h-full flex-col justify-center px-3 @[220px]:px-6">
         <div className="flex items-start gap-1.5 @[220px]:gap-3">
           <div
             className={cn(
