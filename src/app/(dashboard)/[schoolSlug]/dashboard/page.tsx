@@ -141,44 +141,49 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      {/* Row: KPI cards + AI Insight, side by side at every width — same
-          structure as desktop always, no reflow. Cards handle tight space
-          by letting the label wrap to two lines (see StatCard), not by
-          the layout changing shape. */}
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="grid flex-1 grid-cols-2 gap-6 lg:grid-cols-4">
-          <StatCard
-            label="Today's Collection"
-            value={inr(stats.todayCollection)}
-            icon={Wallet}
-            color="purple"
-            trend={trend.collection}
-            deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
-          />
-          <StatCard
-            label="Today's Expenses"
-            value={inr(stats.todayExpenses)}
-            icon={TrendingDown}
-            color="green"
-            trend={trend.expenses}
-            deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
-            goodDirection="down"
-          />
-          <StatCard
-            label="Cash in Hand"
-            value={inr(stats.cashInHand)}
-            icon={TrendingUp}
-            color="orange"
-          />
-          <StatCard
-            label="Pending Fees"
-            value={inr(stats.pendingFees)}
-            icon={Clock}
-            color="red"
-          />
-        </div>
-        <div className="lg:w-80 lg:shrink-0">
-          <AiInsightCard />
+      {/* Row: KPI cards + AI Insight. Driven by @container, not viewport —
+          a viewport breakpoint can't know the sidebar is currently taking
+          240px vs 64px, so it either falls back to desktop-width math (4
+          cards + a 320px AI panel) even when a labeled sidebar has only
+          left ~115px per card, clipping values like "-₹1,20,359". The
+          @[1040px] threshold is the measured point where all 4 cards get
+          enough width (~156px+) regardless of what the sidebar is doing. */}
+      <div className="@container">
+        <div className="flex flex-col gap-6 @[1040px]:flex-row">
+          <div className="grid flex-1 grid-cols-2 gap-6 @[1040px]:grid-cols-4">
+            <StatCard
+              label="Today's Collection"
+              value={inr(stats.todayCollection)}
+              icon={Wallet}
+              color="purple"
+              trend={trend.collection}
+              deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
+            />
+            <StatCard
+              label="Today's Expenses"
+              value={inr(stats.todayExpenses)}
+              icon={TrendingDown}
+              color="green"
+              trend={trend.expenses}
+              deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
+              goodDirection="down"
+            />
+            <StatCard
+              label="Cash in Hand"
+              value={inr(stats.cashInHand)}
+              icon={TrendingUp}
+              color="orange"
+            />
+            <StatCard
+              label="Pending Fees"
+              value={inr(stats.pendingFees)}
+              icon={Clock}
+              color="red"
+            />
+          </div>
+          <div className="@[1040px]:w-80 @[1040px]:shrink-0">
+            <AiInsightCard />
+          </div>
         </div>
       </div>
 
