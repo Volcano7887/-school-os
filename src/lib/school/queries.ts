@@ -44,6 +44,23 @@ export async function getUserSchools(
   }));
 }
 
+export async function getUserRole(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  schoolId: string
+): Promise<SchoolRole | null> {
+  const { data, error } = await supabase
+    .from("school_users")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("school_id", schoolId)
+    .eq("is_active", true)
+    .single();
+
+  if (error || !data) return null;
+  return data.role;
+}
+
 // RLS (schools_select: is_school_member OR created_by = auth.uid()) does the
 // authorization here — this simply returns null if the caller isn't
 // permitted to see the school, same as if it didn't exist.

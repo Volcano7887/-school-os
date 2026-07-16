@@ -13,7 +13,12 @@ export type SchoolRole =
 
 export type StudentGender = "male" | "female" | "other";
 export type AccountType = "asset" | "liability" | "income" | "expense" | "equity";
-export type JournalSourceType = "fee_payment" | "expense" | "salary_payment" | "manual";
+export type JournalSourceType =
+  | "fee_payment"
+  | "expense"
+  | "salary_payment"
+  | "cash_handover"
+  | "manual";
 export type FeeType = "tuition" | "admission" | "exam" | "arrears";
 export type PaymentMode = "cash" | "bank" | "upi";
 export type AuditAction = "create" | "update" | "delete";
@@ -463,6 +468,28 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["salary_payments"]["Insert"]>;
         Relationships: [];
       };
+      cash_handovers: {
+        Row: {
+          id: string;
+          school_id: string;
+          amount: number;
+          note: string | null;
+          received_by: string;
+          journal_entry_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          school_id: string;
+          amount: number;
+          note?: string | null;
+          received_by: string;
+          journal_entry_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["cash_handovers"]["Insert"]>;
+        Relationships: [];
+      };
       audit_logs: {
         Row: {
           id: string;
@@ -536,6 +563,15 @@ export type Database = {
           p_fine_amount?: number;
         };
         Returns: Database["public"]["Tables"]["fee_payments"]["Row"];
+      };
+      record_cash_handover: {
+        Args: {
+          p_school_id: string;
+          p_amount: number;
+          p_note: string | null;
+          p_received_by: string;
+        };
+        Returns: Database["public"]["Tables"]["cash_handovers"]["Row"];
       };
     };
     Enums: {

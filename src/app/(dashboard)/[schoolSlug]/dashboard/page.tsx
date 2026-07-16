@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BadgeCheck, TrendingUp, TrendingDown, Wallet, Clock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getSchoolIdBySlug, getSchoolProfile } from "@/lib/school/queries";
+import { getSchoolIdBySlug, getSchoolProfile, getUserRole } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
 import { getStudentBalances } from "@/lib/fees/queries";
 import { getStaffWithCurrentMonthStatus } from "@/lib/salary/queries";
@@ -22,14 +22,11 @@ import { AiInsightCard } from "@/components/shared/ai-insight-card";
 import { MonthlyCollectionPanel } from "@/components/shared/monthly-collection-panel";
 import { FeeRecoveryGauge } from "@/components/shared/fee-recovery-gauge";
 import { ActionCenter, type ActionCenterAlert } from "@/components/shared/action-center";
-import { EndOfDayClosing } from "@/components/shared/end-of-day-closing";
+import { CashHandoverCard } from "@/components/shared/cash-handover-card";
+import { getCashHandoverHistory } from "@/lib/cash-handovers/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { inr } from "@/lib/utils";
-
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function deltaPercent(today: number, yesterday: number): number | undefined {
   if (today === 0 && yesterday === 0) return undefined;
@@ -47,22 +44,40 @@ export default async function DashboardPage({
   const schoolId = await getSchoolIdBySlug(supabase, schoolSlug);
   if (!schoolId) return null;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const [school, academicYear] = await Promise.all([
     getSchoolProfile(supabase, schoolId),
     getCurrentAcademicYear(supabase, schoolId),
   ]);
 
-  const [stats, chartData, recentTransactions, trend, staff, balances, cashEntries, expenseByCategory] =
-    await Promise.all([
-      getDashboardStats(supabase, schoolId),
-      getMonthlyIncomeExpense(supabase, schoolId),
-      getRecentTransactions(supabase, schoolId),
-      getDailyTrend(supabase, schoolId),
-      getStaffWithCurrentMonthStatus(supabase, schoolId),
-      academicYear ? getStudentBalances(supabase, schoolId, academicYear.id, {}) : Promise.resolve([]),
-      getCashBookEntries(supabase, schoolId, "1000"),
-      getExpenseByCategoryThisMonth(supabase, schoolId),
-    ]);
+  const [
+    stats,
+    chartData,
+    recentTransactions,
+    trend,
+    staff,
+    balances,
+    cashEntries,
+    expenseByCategory,
+    userRole,
+    handoverHistory,
+  ] = await Promise.all([
+    getDashboardStats(supabase, schoolId),
+    getMonthlyIncomeExpense(supabase, schoolId),
+    getRecentTransactions(supabase, schoolId),
+    getDailyTrend(supabase, schoolId),
+    getStaffWithCurrentMonthStatus(supabase, schoolId),
+    academicYear ? getStudentBalances(supabase, schoolId, academicYear.id, {}) : Promise.resolve([]),
+    getCashBookEntries(supabase, schoolId, "1000"),
+    getExpenseByCategoryThisMonth(supabase, schoolId),
+    user ? getUserRole(supabase, user.id, schoolId) : Promise.resolve(null),
+    getCashHandoverHistory(supabase, schoolId),
+  ]);
+
+  const canReceiveCashHandover = userRole === "school_admin" || userRole === "principal";
 
   const collected = balances.reduce((sum, b) => sum + b.totalPaid, 0);
   const totalDue = balances.reduce((sum, b) => sum + Math.max(b.balance, 0), 0);
@@ -89,12 +104,7 @@ export default async function DashboardPage({
     });
   }
 
-  const today = todayIso();
-  const todayCashEntries = cashEntries.filter((e) => e.date === today);
-  const todayIncome = todayCashEntries.reduce((sum, e) => sum + e.debit, 0);
-  const todayExpense = todayCashEntries.reduce((sum, e) => sum + e.credit, 0);
-  const closingCash = cashEntries.at(-1)?.runningBalance ?? 0;
-  const openingCash = closingCash - todayIncome + todayExpense;
+  const cashWithAccountant = cashEntries.at(-1)?.runningBalance ?? 0;
 
   const formattedDate = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
@@ -244,11 +254,11 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <EndOfDayClosing
-        opening={openingCash}
-        income={todayIncome}
-        expense={todayExpense}
-        closing={closingCash}
+      <CashHandoverCard
+        schoolSlug={schoolSlug}
+        balance={cashWithAccountant}
+        canReceive={canReceiveCashHandover}
+        history={handoverHistory}
       />
     </div>
   );

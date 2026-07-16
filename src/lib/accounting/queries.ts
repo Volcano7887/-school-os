@@ -146,7 +146,7 @@ export type CashBookEntry = LedgerEntry & { type: "in" | "out" };
 export async function getCashBookEntries(
   supabase: SupabaseClient<Database>,
   schoolId: string,
-  accountCode: "1000" | "1010"
+  accountCode: "1000" | "1005" | "1010"
 ): Promise<CashBookEntry[]> {
   const { data: account } = await supabase
     .from("ledger_accounts")
