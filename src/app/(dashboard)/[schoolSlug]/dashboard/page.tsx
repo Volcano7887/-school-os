@@ -148,7 +148,7 @@ export default async function DashboardPage({
           since this row's width is the same regardless of screen size
           once the sidebar is accounted for. */}
       <div className="@container">
-        <div className="flex flex-col gap-6 @3xl:flex-row">
+        <div className="flex flex-col gap-6 @5xl:flex-row">
           <div className="grid flex-1 gap-6 @sm:grid-cols-2 @lg:grid-cols-4">
             <StatCard
               label="Today's Collection"
@@ -180,7 +180,7 @@ export default async function DashboardPage({
               color="red"
             />
           </div>
-          <div className="@3xl:w-80 @3xl:shrink-0">
+          <div className="@5xl:w-80 @5xl:shrink-0">
             <AiInsightCard />
           </div>
         </div>
