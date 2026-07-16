@@ -26,7 +26,7 @@ export function Topbar({
   activeSlug: string;
 }) {
   return (
-    <header className="hidden h-14 items-center gap-4 border-b px-6 md:flex">
+    <header className="hidden h-14 items-center gap-2 border-b px-4 md:flex md:gap-4 md:px-6">
       <button
         type="button"
         onClick={() => window.dispatchEvent(new Event("school-os:open-command-palette"))}

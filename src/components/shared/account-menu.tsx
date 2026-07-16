@@ -51,12 +51,17 @@ export function AccountMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex items-center gap-2 rounded-md p-1.5 text-left transition-colors hover:bg-muted"
+          className="flex min-w-0 items-center gap-2 rounded-md p-1.5 text-left transition-colors hover:bg-muted"
         >
-          <Avatar size="sm">
+          <Avatar size="sm" className="shrink-0">
             <AvatarFallback>{initials(name)}</AvatarFallback>
           </Avatar>
-          <span className="hidden min-w-0 sm:block">
+          {/* Explicit max-width, not just `truncate` — truncate only
+              activates once something actually constrains the box, and
+              nothing upstream was doing that, so the full email address
+              (e.g. "amersohel9@gmail.com") rendered at full width and
+              pushed the topbar past the viewport on narrower screens. */}
+          <span className="hidden max-w-28 min-w-0 sm:block lg:max-w-36">
             <span className="block truncate text-sm font-medium">{name}</span>
             <span className="block truncate text-xs text-muted-foreground">
               {ROLE_LABEL[role] ?? role}
