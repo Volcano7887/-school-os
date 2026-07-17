@@ -26,7 +26,7 @@ export function ActionCenter({
         </div>
         {alerts.length === 0 ? (
           <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
-            <CheckCircle2 className="size-4 text-green-600 dark:text-green-400" />
+            <CheckCircle2 className="size-4 text-success" />
             All caught up — nothing needs your attention.
           </div>
         ) : (
@@ -42,8 +42,8 @@ export function ActionCenter({
                     <div
                       className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
                         isHigh
-                          ? "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400"
-                          : "bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400"
+                          ? "bg-destructive/10 text-destructive"
+                          : "bg-warning/10 text-warning"
                       }`}
                     >
                       {isHigh ? (
@@ -54,7 +54,7 @@ export function ActionCenter({
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{alert.label}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground tabular-nums">
                         {isHigh ? "High Priority" : "Attention"} · {alert.meta}
                       </p>
                     </div>

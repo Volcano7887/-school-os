@@ -3,33 +3,11 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const ICON_COLORS = {
-  green: "bg-green-600 text-white dark:bg-green-500",
-  red: "bg-red-600 text-white dark:bg-red-500",
-  blue: "bg-blue-600 text-white dark:bg-blue-500",
-  orange: "bg-orange-500 text-white dark:bg-orange-400",
-  purple: "bg-purple-600 text-white dark:bg-purple-500",
-} as const;
-
-const GRADIENTS = {
-  green: "from-green-100 to-green-50/60 dark:from-green-500/20 dark:to-green-500/5",
-  red: "from-red-100 to-red-50/60 dark:from-red-500/20 dark:to-red-500/5",
-  blue: "from-blue-100 to-blue-50/60 dark:from-blue-500/20 dark:to-blue-500/5",
-  orange: "from-orange-100 to-orange-50/60 dark:from-orange-500/20 dark:to-orange-500/5",
-  purple: "from-purple-100 to-purple-50/60 dark:from-purple-500/20 dark:to-purple-500/5",
-} as const;
-
-const SPARK_COLORS = {
-  green: "#16a34a",
-  red: "#ef4444",
-  blue: "#2563eb",
-  orange: "#f59e0b",
-  purple: "#9333ea",
-} as const;
-
-export type StatCardColor = keyof typeof ICON_COLORS;
-
-function Sparkline({ data, color }: { data: number[]; color: StatCardColor }) {
+// One consistent treatment for every stat card — the old version color-coded
+// each metric (purple/green/orange/red) as pure decoration. Semantic color
+// is reserved for status (the delta below), never spent on labeling a
+// neutral fact like "this is the expenses card."
+function Sparkline({ data }: { data: number[] }) {
   if (data.length < 2 || data.every((v) => v === 0)) return null;
   const max = Math.max(...data, 1);
   const min = Math.min(...data, 0);
@@ -49,7 +27,7 @@ function Sparkline({ data, color }: { data: number[]; color: StatCardColor }) {
       <polyline
         points={points}
         fill="none"
-        stroke={SPARK_COLORS[color]}
+        stroke="var(--primary)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -62,7 +40,6 @@ export function StatCard({
   label,
   value,
   icon: Icon,
-  color,
   caption,
   trend,
   deltaPercent,
@@ -71,7 +48,6 @@ export function StatCard({
   label: string;
   value: string;
   icon: LucideIcon;
-  color: StatCardColor;
   caption?: string;
   trend?: number[];
   deltaPercent?: number;
@@ -84,13 +60,7 @@ export function StatCard({
     deltaPercent !== undefined &&
     (goodDirection === "up" ? deltaPercent >= 0 : deltaPercent <= 0);
   return (
-    <Card
-      size="sm"
-      className={cn(
-        "@container overflow-hidden bg-gradient-to-br shadow-sm",
-        GRADIENTS[color]
-      )}
-    >
+    <Card size="sm" className="@container overflow-hidden">
       {/* h-full + justify-center: cards in the same grid row stretch to
           match the tallest one (some have a delta/sparkline, some don't) —
           without this, a short-content card ends up with its icon/text
@@ -98,12 +68,7 @@ export function StatCard({
           intentional. */}
       <CardContent className="flex h-full flex-col justify-center px-3 @[220px]:px-6">
         <div className="flex items-start gap-1.5 @[220px]:gap-3">
-          <div
-            className={cn(
-              "flex size-7 shrink-0 items-center justify-center rounded-full @[220px]:size-11",
-              ICON_COLORS[color]
-            )}
-          >
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary @[220px]:size-11">
             <Icon className="size-3.5 @[220px]:size-5.5" />
           </div>
           <div className="min-w-0 flex-1">
@@ -112,14 +77,17 @@ export function StatCard({
                 query, not viewport) — this is the one thing on the card
                 that must never clip: a bold 24px number needs ~115px for
                 something like "₹4,63,100", which a ~160px-wide card simply
-                doesn't have at the default size. */}
-            <p className="text-base font-bold @[220px]:text-2xl">{value}</p>
+                doesn't have at the default size. font-mono + tabular-nums:
+                every figure in the product lines up like a real statement. */}
+            <p className="font-mono text-base font-bold tabular-nums @[220px]:text-2xl">
+              {value}
+            </p>
             {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
             {deltaPercent !== undefined && (
               <p
                 className={cn(
-                  "mt-0.5 flex items-center gap-1 text-xs font-medium",
-                  isGood ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                  "mt-0.5 flex items-center gap-1 text-xs font-medium tabular-nums",
+                  isGood ? "text-success" : "text-destructive"
                 )}
               >
                 {deltaPercent >= 0 ? (
@@ -132,7 +100,7 @@ export function StatCard({
             )}
           </div>
         </div>
-        {trend && <Sparkline data={trend} color={color} />}
+        {trend && <Sparkline data={trend} />}
       </CardContent>
     </Card>
   );

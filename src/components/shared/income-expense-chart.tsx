@@ -12,8 +12,8 @@ import {
 } from "recharts";
 import type { MonthlyIncomeExpense } from "@/lib/dashboard/queries";
 
-const INCOME_COLOR = "#16a34a";
-const EXPENSE_COLOR = "#dc2626";
+const INCOME_COLOR = "#2f6e64";
+const EXPENSE_COLOR = "#a3402b";
 
 function formatCompactInr(paise: number) {
   const rupees = paise / 100;

@@ -1,20 +1,24 @@
 import { Wallet, Receipt, Banknote } from "lucide-react";
 import type { RecentTransaction } from "@/lib/dashboard/queries";
 
+// Fee is the only "good news" kind here (money in), so it's the only one
+// that earns the success tone. Expense and salary are both routine outflows
+// — neither is bad news, so neither gets the alarming destructive color;
+// the "-" sign already says "money out" without needing red to shout it.
 const KIND_CONFIG = {
   fee: {
     icon: Wallet,
-    className: "bg-green-100 text-green-600 dark:bg-green-500/15 dark:text-green-400",
+    className: "bg-success/10 text-success",
     sign: "+" as const,
   },
   expense: {
     icon: Receipt,
-    className: "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400",
+    className: "bg-muted text-muted-foreground",
     sign: "-" as const,
   },
   salary: {
     icon: Banknote,
-    className: "bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400",
+    className: "bg-muted text-muted-foreground",
     sign: "-" as const,
   },
 };
@@ -50,10 +54,10 @@ export function RecentTransactions({ transactions }: { transactions: RecentTrans
               <p className="truncate text-xs text-muted-foreground">{t.subLabel}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium">
+              <p className="font-mono text-sm font-medium tabular-nums">
                 {config.sign}₹{(t.amount / 100).toLocaleString("en-IN")}
               </p>
-              <p className="text-xs text-muted-foreground">{formatDateTime(t.date)}</p>
+              <p className="text-xs text-muted-foreground tabular-nums">{formatDateTime(t.date)}</p>
             </div>
           </li>
         );

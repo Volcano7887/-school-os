@@ -78,14 +78,14 @@ export function MonthlyCollectionPanel({
         </div>
 
         <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold text-primary">
+          <span className="font-mono font-semibold tabular-nums text-primary">
             {inr(collected)} / {inr(monthlyFeeTarget)}
           </span>
-          <span className="font-medium">{pct}%</span>
+          <span className="font-mono font-medium tabular-nums">{pct}%</span>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Remaining</span>
-          <span>{inr(remaining)}</span>
+          <span className="font-mono tabular-nums">{inr(remaining)}</span>
         </div>
       </CardContent>
     </Card>

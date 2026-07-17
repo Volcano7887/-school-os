@@ -128,14 +128,18 @@ export default function StyleGuidePage() {
       {/* Stat tiles */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">
-          5. Stat tiles — colored icon chips (real dashboard component)
+          5. Stat tiles — one accent treatment (real dashboard component)
         </h2>
+        <p className="text-sm text-muted-foreground">
+          Every card gets the same accent-tinted icon — semantic color is reserved for the
+          delta/status underneath, never spent on labeling which card is which.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <StatCard label="Today's Collection" value="₹45,300" icon={TrendingUp} color="green" caption="+12.5% from yesterday" />
-          <StatCard label="Today's Expenses" value="₹7,850" icon={TrendingDown} color="red" caption="-6.4% from yesterday" />
-          <StatCard label="Cash in Hand" value="₹1,85,600" icon={Wallet} color="blue" />
-          <StatCard label="Pending Fees" value="₹3,42,000" icon={Clock} color="orange" caption="23 students" />
-          <StatCard label="Pending Salaries" value="₹80,000" icon={Users} color="purple" caption="5 staff" />
+          <StatCard label="Today's Collection" value="₹45,300" icon={TrendingUp} caption="+12.5% from yesterday" />
+          <StatCard label="Today's Expenses" value="₹7,850" icon={TrendingDown} caption="-6.4% from yesterday" />
+          <StatCard label="Cash in Hand" value="₹1,85,600" icon={Wallet} />
+          <StatCard label="Pending Fees" value="₹3,42,000" icon={Clock} caption="23 students" />
+          <StatCard label="Pending Salaries" value="₹80,000" icon={Users} caption="5 staff" />
         </div>
       </section>
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BadgeCheck, TrendingUp, TrendingDown, Wallet, Clock, CheckCircle2 } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, Clock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug, getSchoolProfile, getUserRole } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
@@ -48,10 +48,14 @@ export default async function DashboardPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [school, academicYear] = await Promise.all([
+  const [school, academicYear, profileRow] = await Promise.all([
     getSchoolProfile(supabase, schoolId),
     getCurrentAcademicYear(supabase, schoolId),
+    user
+      ? supabase.from("profiles").select("full_name").eq("id", user.id).single()
+      : Promise.resolve({ data: null }),
   ]);
+  const firstName = profileRow.data?.full_name?.split(" ")[0] ?? "there";
 
   const [
     stats,
@@ -117,16 +121,10 @@ export default async function DashboardPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">{school?.name ?? "Your school"}</h1>
-            <BadgeCheck className="size-6 text-primary" />
-          </div>
-          <div className="mt-0.5 flex flex-wrap items-center gap-3">
-            <p className="text-sm text-muted-foreground">Finance Command Center</p>
-            <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-              {formattedDate}
-            </span>
-          </div>
+          <h1 className="text-2xl font-bold">Good morning, {firstName}</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            {school?.name ?? "Your school"} · {formattedDate}
+          </p>
         </div>
         <QuickActionMenu schoolSlug={schoolSlug} />
       </div>
@@ -137,12 +135,12 @@ export default async function DashboardPage({
           width matches that column exactly. */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm lg:col-span-2">
-          <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+          <span className="flex items-center gap-1.5 text-success">
             <CheckCircle2 className="size-4" />
             Everything looks good today.
           </span>
           {alerts.length > 0 && (
-            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+            <span className="flex items-center gap-1.5 text-warning">
               <Clock className="size-4" />
               {alerts.length} {alerts.length === 1 ? "item requires" : "items require"} your
               attention.
@@ -165,7 +163,6 @@ export default async function DashboardPage({
               label="Today's Collection"
               value={inr(stats.todayCollection)}
               icon={Wallet}
-              color="purple"
               trend={trend.collection}
               deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
             />
@@ -173,7 +170,6 @@ export default async function DashboardPage({
               label="Today's Expenses"
               value={inr(stats.todayExpenses)}
               icon={TrendingDown}
-              color="green"
               trend={trend.expenses}
               deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
               goodDirection="down"
@@ -182,13 +178,11 @@ export default async function DashboardPage({
               label="Cash in Hand"
               value={inr(stats.cashInHand)}
               icon={TrendingUp}
-              color="orange"
             />
             <StatCard
               label="Pending Fees"
               value={inr(stats.pendingFees)}
               icon={Clock}
-              color="red"
             />
           </div>
           <div className="@[1040px]:w-80 @[1040px]:shrink-0">
@@ -197,9 +191,40 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      {/* Main column (left, 2/3) + right rail — a persistent two-column
-          split, not row-by-row grids, so the rail runs alongside the main
-          column instead of interleaving with it. */}
+      {/* Primary at-a-glance zone — mirrors the approved mockup's pairing:
+          a wide "needs attention" queue next to a narrower "what just
+          happened" feed. Action Center and Recent Activity already are
+          those two things; they just used to live apart (one in the right
+          rail, one paired with the expense donut) instead of next to each
+          other, immediately below the headline numbers. */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ActionCenter schoolSlug={schoolSlug} alerts={alerts} />
+        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Activity</CardTitle>
+            <Button asChild variant="ghost" size="sm">
+              <Link href={`/${schoolSlug}/audit-log`}>View all</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <RecentTransactions transactions={recentTransactions} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Everything past this line is real, working functionality that
+          doesn't have a slot in the mockup (it predates it) — kept in
+          full, just demoted below the primary glance zone rather than
+          competing with it for the first five seconds on the page. */}
+      <div className="flex items-center gap-2 pt-2">
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          More detail
+        </p>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
@@ -218,30 +243,17 @@ export default async function DashboardPage({
             studentsPending={studentsPending}
           />
 
-          <div className="grid gap-6 @2xl:grid-cols-2">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Recent Activity</CardTitle>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href={`/${schoolSlug}/audit-log`}>View all</Link>
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <RecentTransactions transactions={recentTransactions} />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Expense Categories</CardTitle>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href={`/${schoolSlug}/reports`}>View full report</Link>
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <ExpenseCategoryDonut data={expenseByCategory} />
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Expense Categories</CardTitle>
+              <Button asChild variant="ghost" size="sm">
+                <Link href={`/${schoolSlug}/reports`}>View full report</Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <ExpenseCategoryDonut data={expenseByCategory} />
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -250,7 +262,6 @@ export default async function DashboardPage({
             months={chartData}
             monthlyFeeTarget={school?.monthlyFeeTarget ?? null}
           />
-          <ActionCenter schoolSlug={schoolSlug} alerts={alerts} />
         </div>
       </div>
 

@@ -68,7 +68,7 @@ export function CashHandoverCard({
         </div>
 
         <div className="flex items-center gap-4">
-          <p className="text-2xl font-bold">{inr(balance)}</p>
+          <p className="font-mono text-2xl font-bold tabular-nums">{inr(balance)}</p>
 
           {canReceive && balance > 0 && (
             <Dialog open={open} onOpenChange={setOpen}>
@@ -130,7 +130,7 @@ export function CashHandoverCard({
                   Received by {h.receivedByName}
                   {h.note ? ` · ${h.note}` : ""}
                 </span>
-                <span className="font-medium">{inr(h.amount)}</span>
+                <span className="font-mono font-medium tabular-nums">{inr(h.amount)}</span>
               </li>
             ))}
           </ul>

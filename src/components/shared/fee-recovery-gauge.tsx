@@ -58,7 +58,7 @@ export function FeeRecoveryGauge({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-xl font-semibold">{pct}%</span>
+              <span className="font-mono text-xl font-semibold tabular-nums">{pct}%</span>
               <span className="text-[10px] text-muted-foreground">Recovery Rate</span>
             </div>
           </div>
@@ -66,13 +66,13 @@ export function FeeRecoveryGauge({
           <div className="flex-1 space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Collected</span>
-              <span className="font-medium text-green-600 dark:text-green-400">
+              <span className="font-mono font-medium tabular-nums text-success">
                 {inr(collected)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Total Due</span>
-              <span className="font-medium">{inr(total)}</span>
+              <span className="font-mono font-medium tabular-nums">{inr(total)}</span>
             </div>
 
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -84,11 +84,13 @@ export function FeeRecoveryGauge({
 
             <div className="flex justify-between pt-1">
               <span className="text-muted-foreground">Remaining</span>
-              <span className="font-medium text-destructive">{inr(totalDue)}</span>
+              <span className="font-mono font-medium tabular-nums text-destructive">
+                {inr(totalDue)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Students Pending</span>
-              <span className="font-medium">{studentsPending}</span>
+              <span className="font-mono font-medium tabular-nums">{studentsPending}</span>
             </div>
           </div>
         </div>
