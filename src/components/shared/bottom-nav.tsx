@@ -46,7 +46,7 @@ export function BottomNav({
             )}
           >
             <item.icon className="size-5" />
-            {item.label}
+            {item.shortLabel ?? item.label}
           </Link>
         );
       })}
@@ -75,7 +75,7 @@ export function BottomNav({
             )}
           >
             <item.icon className="size-5" />
-            {item.label}
+            {item.shortLabel ?? item.label}
           </Link>
         );
       })}
@@ -126,7 +126,7 @@ export function BottomNav({
                 className="flex flex-col items-center gap-1.5 rounded-lg border p-3 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <item.icon className="size-5" />
-                {item.label}
+                {item.shortLabel ?? item.label}
               </Link>
             ))}
           </div>

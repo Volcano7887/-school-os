@@ -17,6 +17,10 @@ import {
 
 export type NavItem = {
   label: string;
+  /** Short display label for the mobile tab bar, where "Command Center"
+   * wraps onto two lines. Display-only — the module keeps its real name
+   * everywhere else. */
+  shortLabel?: string;
   href: string;
   icon: LucideIcon;
 };
@@ -27,7 +31,7 @@ export type NavItem = {
 // Consolidated per the redesign roadmap (§3000-A): one nav entry, one
 // /fees route, with Collect/Due/History as an in-page segmented view.
 // The old sub-pages redirect here (see fees/[...old]/route redirects).
-const COMMAND_CENTER: NavItem = { label: "Command Center", href: "/dashboard", icon: LayoutDashboard };
+const COMMAND_CENTER: NavItem = { label: "Command Center", shortLabel: "Home", href: "/dashboard", icon: LayoutDashboard };
 const FEES: NavItem = { label: "Fees", href: "/fees", icon: Wallet };
 const EXPENSES: NavItem = { label: "Expenses", href: "/expenses", icon: Receipt };
 const STUDENTS: NavItem = { label: "Students", href: "/students", icon: Users };
