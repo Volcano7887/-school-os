@@ -55,7 +55,7 @@ export default async function DashboardPage({
       ? supabase.from("profiles").select("full_name").eq("id", user.id).single()
       : Promise.resolve({ data: null }),
   ]);
-  const firstName = profileRow.data?.full_name?.split(" ")[0] ?? "there";
+  const firstName = profileRow.data?.full_name?.split(" ")[0];
 
   const [
     stats,
@@ -121,7 +121,7 @@ export default async function DashboardPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Good morning, {firstName}</h1>
+          <h1 className="text-2xl font-bold">Good morning{firstName ? `, ${firstName}` : ""}</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {school?.name ?? "Your school"} · {formattedDate}
           </p>
