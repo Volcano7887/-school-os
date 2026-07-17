@@ -1,8 +1,17 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolProfile } from "@/lib/school/queries";
 import { getFeeReceipt } from "@/lib/fees/queries";
 import { amountInWords } from "@/lib/numbers/amount-in-words";
+
+// ImageResponse's default font falls back to a runtime fetch to Google
+// Fonts, which isn't reliable inside a serverless function (this was the
+// actual cause of a silent 500 on every receipt share). Bundling the font
+// locally removes that network dependency entirely.
+const fontRegular = readFile(join(process.cwd(), "src/assets/fonts/Roboto-Regular.woff"));
+const fontBold = readFile(join(process.cwd(), "src/assets/fonts/Roboto-Bold.woff"));
 
 const PAYMENT_MODE_LABEL: Record<string, string> = {
   cash: "Cash",
@@ -66,7 +75,7 @@ export async function GET(
           display: "flex",
           flexDirection: "column",
           backgroundColor: "#ffffff",
-          fontFamily: "sans-serif",
+          fontFamily: "Roboto",
         }}
       >
         <div style={{ height: 14, backgroundColor: "#4f46e5", display: "flex" }} />
@@ -261,6 +270,13 @@ export async function GET(
         </div>
       </div>
     ),
-    { width: 900, height: 1180 }
+    {
+      width: 900,
+      height: 1180,
+      fonts: [
+        { name: "Roboto", data: await fontRegular, weight: 400, style: "normal" },
+        { name: "Roboto", data: await fontBold, weight: 700, style: "normal" },
+      ],
+    }
   );
 }
