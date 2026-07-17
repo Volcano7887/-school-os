@@ -200,33 +200,57 @@ export function FeeCollectionWorkspace({
               </Table>
             </div>
 
+            {/* Mobile list: compact rows in the locked mockup's shape —
+                name + status, then class on the left with the ONE number
+                that matters (balance) on the right, and small actions.
+                The old version showed "paid / due" (ambiguous) and gave
+                every row a full-width Collect button, which made the list
+                read as a wall of buttons instead of a list of students. */}
             <div className="space-y-2 sm:hidden">
               {students.map((s) => {
                 const status = statusFor(s.totalDue, s.totalPaid, s.balance);
                 return (
-                  <div key={s.studentId} className="rounded-lg border p-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{s.fullName}</span>
+                  <div key={s.studentId} className="rounded-xl border bg-card p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => selectStudent(s.studentId)}
+                        className="min-w-0 flex-1 truncate text-left text-sm font-semibold"
+                      >
+                        {s.fullName}
+                      </button>
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
+                        className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${status.className}`}
                       >
                         {status.label}
                       </span>
                     </div>
-                    <div className="mt-1 flex justify-between text-sm text-muted-foreground">
-                      <span>{s.className ?? "No class"}</span>
-                      <span>
-                        {inr(s.totalPaid)} / {inr(s.totalDue)}
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {s.className ?? "No class"}
                       </span>
+                      {s.balance > 0 ? (
+                        <span className="font-mono text-sm font-semibold text-destructive tabular-nums">
+                          {inr(s.balance)} due
+                        </span>
+                      ) : s.balance < 0 ? (
+                        <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                          {inr(Math.abs(s.balance))} advance
+                        </span>
+                      ) : (
+                        <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                          {inr(s.totalPaid)} paid
+                        </span>
+                      )}
                     </div>
-                    <div className="mt-2 flex gap-2">
+                    <div className="mt-2 flex items-center justify-end gap-2">
                       {s.balance > 0 && (
                         <SendReminderDropdown student={s} schoolName={schoolName} />
                       )}
                       <button
                         type="button"
                         onClick={() => selectStudent(s.studentId)}
-                        className="flex-1 rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+                        className="rounded-lg bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground"
                       >
                         Collect
                       </button>

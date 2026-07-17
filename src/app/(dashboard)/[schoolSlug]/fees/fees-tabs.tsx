@@ -22,13 +22,15 @@ export function FeesTabs({
   ];
 
   return (
-    <div className="inline-flex gap-1 rounded-lg border bg-card p-1">
+    // Full-width with equal segments on phones (matches the mockup's mobile
+    // frame), shrink-to-content from sm up.
+    <div className="flex w-full gap-1 rounded-lg border bg-card p-1 sm:inline-flex sm:w-auto">
       {tabs.map((tab) => (
         <Link
           key={tab.key}
           href={tab.key === "collect" ? `/${schoolSlug}/fees` : `/${schoolSlug}/fees?view=${tab.key}`}
           className={cn(
-            "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
+            "flex-1 rounded-md px-3.5 py-1.5 text-center text-sm font-medium transition-colors sm:flex-initial",
             active === tab.key
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:bg-muted"

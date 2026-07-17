@@ -117,10 +117,12 @@ export default async function DashboardPage({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Good morning{firstName ? `, ${firstName}` : ""}</h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">
+        <h1 className="text-xl font-bold md:text-2xl">
+          Good morning{firstName ? `, ${firstName}` : ""}
+        </h1>
+        <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">
           {school?.name ?? "Your school"} · {formattedDate}
         </p>
       </div>
@@ -129,7 +131,7 @@ export default async function DashboardPage({
           "everything looks good" AND an attention count in the same breath
           was the original redundancy this line existed to avoid. Exactly
           one of the two renders now. */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
         {alerts.length > 0 ? (
           <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-warning/20 bg-warning/10 px-4 py-2.5 text-sm font-medium text-warning lg:col-span-2">
             <Clock className="size-4 shrink-0" />
@@ -152,12 +154,12 @@ export default async function DashboardPage({
           defaulters count and a real CTA) still lives in the detail zone
           below, not lost. */}
       <div className="@container">
-        <div className="flex flex-col gap-6 @[1040px]:flex-row">
-          <div className="flex-1 space-y-3">
+        <div className="flex flex-col gap-4 @[1040px]:flex-row md:gap-6">
+          <div className="flex-1 space-y-2.5 md:space-y-3">
             <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Today
             </p>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
               <StatCard
                 label="Collection"
                 value={inr(stats.todayCollection)}
@@ -179,7 +181,7 @@ export default async function DashboardPage({
             <p className="pt-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Right now
             </p>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
               <StatCard
                 label="Cash in Hand"
                 value={inr(stats.cashInHand)}
@@ -211,7 +213,7 @@ export default async function DashboardPage({
           confirms real cash actually changed hands), so it doesn't belong
           buried below six other cards. Action Center + Recent Activity
           keep their existing pairing. */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <ActionCenter schoolSlug={schoolSlug} alerts={alerts} />
         </div>
@@ -246,7 +248,7 @@ export default async function DashboardPage({
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
