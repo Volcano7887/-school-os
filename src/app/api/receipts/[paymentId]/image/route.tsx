@@ -48,7 +48,7 @@ export async function GET(
             color: "black",
           }}
         >
-          {receipt.receiptNo} — {school.name}
+          {receipt.receiptNo} — {school.name} · test
         </div>
       ),
       { width: 400, height: 300 }
