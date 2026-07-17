@@ -66,20 +66,22 @@ export function StatCard({
           without this, a short-content card ends up with its icon/text
           pinned to the top and a big dead gap below instead of looking
           intentional. */}
-      <CardContent className="flex h-full flex-col justify-center px-3 @[220px]:px-6">
-        <div className="flex items-start gap-1.5 @[220px]:gap-3">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary @[220px]:size-11">
-            <Icon className="size-3.5 @[220px]:size-5.5" />
+      <CardContent className="flex h-full flex-col justify-center px-3 @[220px]:px-4">
+        <div className="flex items-start gap-1.5 @[220px]:gap-2.5">
+          <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary @[220px]:size-7">
+            <Icon className="size-3.5 @[220px]:size-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-tight text-muted-foreground">{label}</p>
+            <p className="text-xs leading-tight text-muted-foreground">{label}</p>
             {/* Value font shrinks when the CARD ITSELF is narrow (container
                 query, not viewport) — this is the one thing on the card
-                that must never clip: a bold 24px number needs ~115px for
+                that must never clip: a bold number needs real width for
                 something like "₹4,63,100", which a ~160px-wide card simply
                 doesn't have at the default size. font-mono + tabular-nums:
-                every figure in the product lines up like a real statement. */}
-            <p className="font-mono text-base font-bold tabular-nums @[220px]:text-2xl">
+                every figure in the product lines up like a real statement.
+                Capped at text-xl/semibold, not text-2xl/bold — matches the
+                locked mockup's restrained scale instead of a hero-stat size. */}
+            <p className="font-mono text-base font-semibold tabular-nums @[220px]:text-xl">
               {value}
             </p>
             {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
