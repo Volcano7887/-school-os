@@ -3,17 +3,29 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-// One consistent treatment for every stat card — the old version color-coded
-// each metric (purple/green/orange/red) as pure decoration. Semantic color
-// is reserved for status (the delta below), never spent on labeling a
-// neutral fact like "this is the expenses card."
-function Sparkline({ data }: { data: number[] }) {
+// Matches the locked Dashboard mockup: label + a small rounded-square icon
+// chip on the top row (label left, chip right), the value big below it, then
+// delta + sparkline. The chip colour is SEMANTIC — it encodes what kind of
+// metric this is (money in = green, money out = red, a standing cash balance
+// = brand teal, something needing attention = amber) — not one accent spent
+// on every card for decoration. That's the distinction the roadmap drew:
+// colour has to mean something on a financial screen.
+type Accent = "income" | "expense" | "neutral" | "attention";
+
+const ACCENT: Record<Accent, { chip: string; stroke: string }> = {
+  income: { chip: "bg-success/10 text-success", stroke: "var(--success)" },
+  expense: { chip: "bg-destructive/10 text-destructive", stroke: "var(--destructive)" },
+  neutral: { chip: "bg-primary/10 text-primary", stroke: "var(--primary)" },
+  attention: { chip: "bg-warning/10 text-warning", stroke: "var(--warning)" },
+};
+
+function Sparkline({ data, stroke }: { data: number[]; stroke: string }) {
   if (data.length < 2 || data.every((v) => v === 0)) return null;
   const max = Math.max(...data, 1);
   const min = Math.min(...data, 0);
   const range = max - min || 1;
   const w = 80;
-  const h = 24;
+  const h = 22;
   const points = data
     .map((v, i) => {
       const x = (i / (data.length - 1)) * w;
@@ -23,11 +35,16 @@ function Sparkline({ data }: { data: number[] }) {
     .join(" ");
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 h-6 w-full" preserveAspectRatio="none" aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className="mt-2 hidden h-5 w-full @[170px]:block"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
       <polyline
         points={points}
         fill="none"
-        stroke="var(--primary)"
+        stroke={stroke}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -40,6 +57,7 @@ export function StatCard({
   label,
   value,
   icon: Icon,
+  accent = "neutral",
   caption,
   trend,
   deltaPercent,
@@ -48,61 +66,62 @@ export function StatCard({
   label: string;
   value: string;
   icon: LucideIcon;
+  accent?: Accent;
   caption?: string;
   trend?: number[];
   deltaPercent?: number;
   /** Which direction of change is good news for this metric — e.g. Today's
-   * Expenses going down is good, so it passes "down". Only affects color;
+   * Expenses going down is good, so it passes "down". Only affects colour;
    * the arrow always reflects the actual direction of change. */
   goodDirection?: "up" | "down";
 }) {
   const isGood =
     deltaPercent !== undefined &&
     (goodDirection === "up" ? deltaPercent >= 0 : deltaPercent <= 0);
+  const a = ACCENT[accent];
+
   return (
     <Card size="sm" className="@container overflow-hidden">
-      {/* h-full + justify-center: cards in the same grid row stretch to
-          match the tallest one (some have a delta/sparkline, some don't) —
-          without this, a short-content card ends up with its icon/text
-          pinned to the top and a big dead gap below instead of looking
-          intentional. */}
-      <CardContent className="flex h-full flex-col justify-center px-3 @[220px]:px-4">
-        <div className="flex items-start gap-1.5 @[220px]:gap-2.5">
-          <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary @[220px]:size-7">
-            <Icon className="size-3.5 @[220px]:size-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs leading-tight text-muted-foreground">{label}</p>
-            {/* Value font shrinks when the CARD ITSELF is narrow (container
-                query, not viewport) — this is the one thing on the card
-                that must never clip: a bold number needs real width for
-                something like "₹4,63,100", which a ~160px-wide card simply
-                doesn't have at the default size. font-mono + tabular-nums:
-                every figure in the product lines up like a real statement.
-                Capped at text-xl/semibold, not text-2xl/bold — matches the
-                locked mockup's restrained scale instead of a hero-stat size. */}
-            <p className="font-mono text-base font-semibold tabular-nums @[220px]:text-xl">
-              {value}
-            </p>
-            {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
-            {deltaPercent !== undefined && (
-              <p
-                className={cn(
-                  "mt-0.5 flex items-center gap-1 text-xs font-medium tabular-nums",
-                  isGood ? "text-success" : "text-destructive"
-                )}
-              >
-                {deltaPercent >= 0 ? (
-                  <TrendingUp className="size-3" />
-                ) : (
-                  <TrendingDown className="size-3" />
-                )}
-                {Math.abs(deltaPercent).toFixed(0)}% vs yesterday
-              </p>
+      <CardContent className="px-3.5 py-3 @[200px]:px-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="truncate text-xs text-muted-foreground @[200px]:text-[13px]">{label}</p>
+          <div
+            className={cn(
+              "flex size-6 shrink-0 items-center justify-center rounded-lg @[200px]:size-7",
+              a.chip
             )}
+          >
+            <Icon className="size-3.5 @[200px]:size-4" />
           </div>
         </div>
-        {trend && <Sparkline data={trend} />}
+
+        {/* Value stays mono + tabular so every figure in the product lines up
+            like a real statement; shrinks a step on genuinely narrow cards so
+            "₹4,63,100" never clips, but caps at text-xl — the mockup's
+            restrained scale, not a hero-stat size. */}
+        <p className="mt-2 font-mono text-lg font-semibold tabular-nums @[200px]:text-xl">
+          {value}
+        </p>
+
+        {caption && <p className="mt-1 text-[11px] text-muted-foreground">{caption}</p>}
+
+        {deltaPercent !== undefined && (
+          <p
+            className={cn(
+              "mt-1 flex items-center gap-1 text-[11px] font-medium tabular-nums",
+              isGood ? "text-success" : "text-destructive"
+            )}
+          >
+            {deltaPercent >= 0 ? (
+              <TrendingUp className="size-3" />
+            ) : (
+              <TrendingDown className="size-3" />
+            )}
+            {Math.abs(deltaPercent).toFixed(1)}% vs yesterday
+          </p>
+        )}
+
+        {trend && <Sparkline data={trend} stroke={a.stroke} />}
       </CardContent>
     </Card>
   );

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TrendingUp, TrendingDown, Wallet, Clock, CheckCircle2 } from "lucide-react";
+import { Wallet, Receipt, Landmark, Users, Clock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug, getSchoolProfile, getUserRole } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
@@ -130,19 +130,17 @@ export default async function DashboardPage({
           was the original redundancy this line existed to avoid. Exactly
           one of the two renders now. */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm lg:col-span-2">
-          {alerts.length > 0 ? (
-            <span className="flex items-center gap-1.5 text-warning">
-              <Clock className="size-4" />
-              {alerts.length} {alerts.length === 1 ? "item needs" : "items need"} your attention.
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 text-success">
-              <CheckCircle2 className="size-4" />
-              Everything looks good today.
-            </span>
-          )}
-        </div>
+        {alerts.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-warning/20 bg-warning/10 px-4 py-2.5 text-sm font-medium text-warning lg:col-span-2">
+            <Clock className="size-4 shrink-0" />
+            {alerts.length} {alerts.length === 1 ? "item needs" : "items need"} your attention.
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-success/20 bg-success/10 px-4 py-2.5 text-sm font-medium text-success lg:col-span-2">
+            <CheckCircle2 className="size-4 shrink-0" />
+            Everything looks good today.
+          </div>
+        )}
       </div>
 
       {/* KPI row split by time-scope, not shown as one undifferentiated
@@ -164,13 +162,15 @@ export default async function DashboardPage({
                 label="Collection"
                 value={inr(stats.todayCollection)}
                 icon={Wallet}
+                accent="income"
                 trend={trend.collection}
                 deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
               />
               <StatCard
                 label="Expenses"
                 value={inr(stats.todayExpenses)}
-                icon={TrendingDown}
+                icon={Receipt}
+                accent="expense"
                 trend={trend.expenses}
                 deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
                 goodDirection="down"
@@ -180,11 +180,17 @@ export default async function DashboardPage({
               Right now
             </p>
             <div className="grid grid-cols-2 gap-6">
-              <StatCard label="Cash in Hand" value={inr(stats.cashInHand)} icon={TrendingUp} />
+              <StatCard
+                label="Cash in Hand"
+                value={inr(stats.cashInHand)}
+                icon={Landmark}
+                accent="neutral"
+              />
               <StatCard
                 label="Pending Fees"
                 value={inr(stats.pendingFees)}
-                icon={Clock}
+                icon={Users}
+                accent="attention"
                 caption={
                   collected + totalDue > 0
                     ? `${Math.round((collected / (collected + totalDue)) * 100)}% collected this year`
