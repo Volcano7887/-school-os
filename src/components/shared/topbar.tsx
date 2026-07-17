@@ -3,6 +3,7 @@
 import { Search, Bell } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { AccountMenu } from "@/components/shared/account-menu";
+import { QuickActionMenu } from "@/components/shared/quick-action-menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +41,10 @@ export function Topbar({
           Ctrl+K
         </kbd>
       </button>
+
+      <div className="hidden sm:block">
+        <QuickActionMenu schoolSlug={activeSlug} />
+      </div>
 
       <ThemeToggle />
 

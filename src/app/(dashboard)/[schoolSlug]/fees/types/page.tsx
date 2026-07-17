@@ -56,7 +56,7 @@ export default async function FeeTypesPage({
       <Breadcrumb
         items={[
           { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fee Collection", href: `/${schoolSlug}/fees` },
+          { label: "Fees", href: `/${schoolSlug}/fees` },
           { label: "Fees Type" },
         ]}
       />

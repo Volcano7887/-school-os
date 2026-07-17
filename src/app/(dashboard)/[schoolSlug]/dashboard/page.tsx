@@ -17,7 +17,6 @@ import { StatCard } from "@/components/shared/stat-card";
 import { IncomeExpenseChart } from "@/components/shared/income-expense-chart";
 import { RecentTransactions } from "@/components/shared/recent-transactions";
 import { ExpenseCategoryDonut } from "@/components/shared/expense-category-donut";
-import { QuickActionMenu } from "@/components/shared/quick-action-menu";
 import { AiInsightCard } from "@/components/shared/ai-insight-card";
 import { MonthlyCollectionPanel } from "@/components/shared/monthly-collection-panel";
 import { FeeRecoveryGauge } from "@/components/shared/fee-recovery-gauge";
@@ -119,71 +118,80 @@ export default async function DashboardPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Good morning{firstName ? `, ${firstName}` : ""}</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            {school?.name ?? "Your school"} · {formattedDate}
-          </p>
-        </div>
-        <QuickActionMenu schoolSlug={schoolSlug} />
+      <div>
+        <h1 className="text-2xl font-bold">Good morning{firstName ? `, ${firstName}` : ""}</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          {school?.name ?? "Your school"} · {formattedDate}
+        </p>
       </div>
 
-      {/* Status banner is intentionally only as wide as the main column
-          below (2/3), not the full page — it shouldn't run under where
-          AI Insight sits. Rendered as its own single-cell grid row so its
-          width matches that column exactly. */}
+      {/* Status: a school is either on track or it isn't — showing both
+          "everything looks good" AND an attention count in the same breath
+          was the original redundancy this line existed to avoid. Exactly
+          one of the two renders now. */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-2.5 text-sm lg:col-span-2">
-          <span className="flex items-center gap-1.5 text-success">
-            <CheckCircle2 className="size-4" />
-            Everything looks good today.
-          </span>
-          {alerts.length > 0 && (
+          {alerts.length > 0 ? (
             <span className="flex items-center gap-1.5 text-warning">
               <Clock className="size-4" />
-              {alerts.length} {alerts.length === 1 ? "item requires" : "items require"} your
-              attention.
+              {alerts.length} {alerts.length === 1 ? "item needs" : "items need"} your attention.
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-success">
+              <CheckCircle2 className="size-4" />
+              Everything looks good today.
             </span>
           )}
         </div>
       </div>
 
-      {/* Row: KPI cards + AI Insight. Driven by @container, not viewport —
-          a viewport breakpoint can't know the sidebar is currently taking
-          240px vs 64px, so it either falls back to desktop-width math (4
-          cards + a 320px AI panel) even when a labeled sidebar has only
-          left ~115px per card, clipping values like "-₹1,20,359". The
-          @[1040px] threshold is the measured point where all 4 cards get
-          enough width (~156px+) regardless of what the sidebar is doing. */}
+      {/* KPI row split by time-scope, not shown as one undifferentiated
+          grid: Today's Collection/Expenses are daily flows, Cash in Hand/
+          Pending Fees are standing balances — grouping them identically
+          made them read as more comparable than they are. Recovery % rides
+          along as Pending Fees' caption instead of a separate gauge card
+          competing for the same five seconds; the full breakdown (with a
+          defaulters count and a real CTA) still lives in the detail zone
+          below, not lost. */}
       <div className="@container">
         <div className="flex flex-col gap-6 @[1040px]:flex-row">
-          <div className="grid flex-1 grid-cols-2 gap-6 @[1040px]:grid-cols-4">
-            <StatCard
-              label="Today's Collection"
-              value={inr(stats.todayCollection)}
-              icon={Wallet}
-              trend={trend.collection}
-              deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
-            />
-            <StatCard
-              label="Today's Expenses"
-              value={inr(stats.todayExpenses)}
-              icon={TrendingDown}
-              trend={trend.expenses}
-              deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
-              goodDirection="down"
-            />
-            <StatCard
-              label="Cash in Hand"
-              value={inr(stats.cashInHand)}
-              icon={TrendingUp}
-            />
-            <StatCard
-              label="Pending Fees"
-              value={inr(stats.pendingFees)}
-              icon={Clock}
-            />
+          <div className="flex-1 space-y-3">
+            <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Today
+            </p>
+            <div className="grid grid-cols-2 gap-6">
+              <StatCard
+                label="Collection"
+                value={inr(stats.todayCollection)}
+                icon={Wallet}
+                trend={trend.collection}
+                deltaPercent={deltaPercent(stats.todayCollection, trend.yesterdayCollection)}
+              />
+              <StatCard
+                label="Expenses"
+                value={inr(stats.todayExpenses)}
+                icon={TrendingDown}
+                trend={trend.expenses}
+                deltaPercent={deltaPercent(stats.todayExpenses, trend.yesterdayExpenses)}
+                goodDirection="down"
+              />
+            </div>
+            <p className="pt-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Right now
+            </p>
+            <div className="grid grid-cols-2 gap-6">
+              <StatCard label="Cash in Hand" value={inr(stats.cashInHand)} icon={TrendingUp} />
+              <StatCard
+                label="Pending Fees"
+                value={inr(stats.pendingFees)}
+                icon={Clock}
+                caption={
+                  collected + totalDue > 0
+                    ? `${Math.round((collected / (collected + totalDue)) * 100)}% collected this year`
+                    : undefined
+                }
+              />
+            </div>
           </div>
           <div className="@[1040px]:w-80 @[1040px]:shrink-0">
             <AiInsightCard />
@@ -191,28 +199,35 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      {/* Primary at-a-glance zone — mirrors the approved mockup's pairing:
-          a wide "needs attention" queue next to a narrower "what just
-          happened" feed. Action Center and Recent Activity already are
-          those two things; they just used to live apart (one in the right
-          rail, one paired with the expense donut) instead of next to each
-          other, immediately below the headline numbers. */}
+      {/* Primary at-a-glance zone. Cash Handover moved up here from the
+          very bottom of the page — for a Principal/Admin it's the single
+          highest-trust action on the whole dashboard (they're the one who
+          confirms real cash actually changed hands), so it doesn't belong
+          buried below six other cards. Action Center + Recent Activity
+          keep their existing pairing. */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <ActionCenter schoolSlug={schoolSlug} alerts={alerts} />
         </div>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Activity</CardTitle>
-            <Button asChild variant="ghost" size="sm">
-              <Link href={`/${schoolSlug}/audit-log`}>View all</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <RecentTransactions transactions={recentTransactions} />
-          </CardContent>
-        </Card>
+        <CashHandoverCard
+          schoolSlug={schoolSlug}
+          balance={cashWithAccountant}
+          canReceive={canReceiveCashHandover}
+          history={handoverHistory}
+        />
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Recent Activity</CardTitle>
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/${schoolSlug}/audit-log`}>View all</Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <RecentTransactions transactions={recentTransactions} />
+        </CardContent>
+      </Card>
 
       {/* Everything past this line is real, working functionality that
           doesn't have a slot in the mockup (it predates it) — kept in
@@ -264,13 +279,6 @@ export default async function DashboardPage({
           />
         </div>
       </div>
-
-      <CashHandoverCard
-        schoolSlug={schoolSlug}
-        balance={cashWithAccountant}
-        canReceive={canReceiveCashHandover}
-        history={handoverHistory}
-      />
     </div>
   );
 }

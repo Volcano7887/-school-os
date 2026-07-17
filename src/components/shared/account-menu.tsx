@@ -79,20 +79,28 @@ export function AccountMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-          Switch school
-        </DropdownMenuLabel>
-        {schools.map((school) => (
-          <DropdownMenuItem key={school.id} asChild>
-            <Link
-              href={`/${school.slug}/dashboard`}
-              className="flex w-full items-center justify-between"
-            >
-              <span className="truncate">{school.name}</span>
-              {school.slug === activeSlug && <Check className="size-4" />}
-            </Link>
-          </DropdownMenuItem>
-        ))}
+        {/* Per the redesign roadmap (§3000-C): the switcher is noise for
+            anyone who only ever runs one school — most Principals — so it
+            only renders at all once an account actually belongs to more
+            than one. */}
+        {schools.length > 1 && (
+          <>
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              Switch school
+            </DropdownMenuLabel>
+            {schools.map((school) => (
+              <DropdownMenuItem key={school.id} asChild>
+                <Link
+                  href={`/${school.slug}/dashboard`}
+                  className="flex w-full items-center justify-between"
+                >
+                  <span className="truncate">{school.name}</span>
+                  {school.slug === activeSlug && <Check className="size-4" />}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/onboarding" className="flex w-full items-center gap-1.5">
             <Plus className="size-4" />

@@ -36,7 +36,7 @@ export default async function FeesCarryForwardPage({
         <Breadcrumb
           items={[
             { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-            { label: "Fee Collection", href: `/${schoolSlug}/fees` },
+            { label: "Fees", href: `/${schoolSlug}/fees` },
             { label: "Fees Carry Forward" },
           ]}
         />
@@ -60,7 +60,7 @@ export default async function FeesCarryForwardPage({
       <Breadcrumb
         items={[
           { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fee Collection", href: `/${schoolSlug}/fees` },
+          { label: "Fees", href: `/${schoolSlug}/fees` },
           { label: "Fees Carry Forward" },
         ]}
       />

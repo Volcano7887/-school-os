@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-inter);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+  --font-heading: var(--font-plex-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -58,101 +58,102 @@
 }
 
 :root {
-  /* Trusted Ledger — warm paper neutrals, one restrained accent (Ledger
-     Green), semantic status kept as its own palette so it's never
-     mistakable for the brand accent. */
-  --background: #faf7f1;
-  --foreground: #1b1c18;
+  /* School OS redesign, locked 2026-07-18 (Dashboard + Fee Collection).
+     Deep teal as the one brand accent — deliberately not the fintech-blue
+     or purple every other SaaS dashboard reaches for — kept out of the
+     income/expense semantic family so data color never doubles as brand
+     color. Warm paper background, not stark white. Supersedes the prior
+     "Trusted Ledger" values (architecture kept, palette replaced). */
+  --background: #f6f5f0;
+  --foreground: #1b211f;
   --card: #ffffff;
-  --card-foreground: #1b1c18;
+  --card-foreground: #1b211f;
   --popover: #ffffff;
-  --popover-foreground: #1b1c18;
-  --primary: #1f5d3b;
-  --primary-foreground: #f4f1e8;
-  --secondary: #f2eee4;
-  --secondary-foreground: #1b1c18;
-  --muted: #f2eee4;
-  --muted-foreground: #837c6b;
-  --accent: #e4ede6;
-  --accent-foreground: #1f5d3b;
-  --destructive: #a3402b;
-  --success: #2f6e64;
-  --success-foreground: #e1eeea;
-  --warning: #a5711f;
-  --warning-foreground: #f3e7d3;
-  --border: #e6e0d2;
-  --input: #e6e0d2;
-  --ring: #1f5d3b;
-  --brand-indigo: #1f5d3b;
-  --brand-blue: #2f6e64;
-  --brand-green: #2f6e64;
-  --brand-amber: #a5711f;
-  --brand-red: #a3402b;
-  --chart-1: #1f5d3b;
-  --chart-2: #a3402b;
-  --chart-3: #a5711f;
-  --chart-4: #2f6e64;
-  --chart-5: #74705f;
+  --popover-foreground: #1b211f;
+  --primary: #0b7d6c;
+  --primary-foreground: #ffffff;
+  --secondary: #eeece4;
+  --secondary-foreground: #1b211f;
+  --muted: #eeece4;
+  --muted-foreground: #8b958f;
+  --accent: #e1f1ec;
+  --accent-foreground: #0b7d6c;
+  --destructive: #ae3b2e;
+  --success: #1e7a4c;
+  --success-foreground: #ffffff;
+  --warning: #93650f;
+  --warning-foreground: #ffffff;
+  --border: #e3e0d6;
+  --input: #e3e0d6;
+  --ring: #0b7d6c;
+  --brand-indigo: #0b7d6c;
+  --brand-blue: #2f7a8c;
+  --brand-green: #1e7a4c;
+  --brand-amber: #93650f;
+  --brand-red: #ae3b2e;
+  --chart-1: #0b7d6c;
+  --chart-2: #ae3b2e;
+  --chart-3: #93650f;
+  --chart-4: #1e7a4c;
+  --chart-5: #8b958f;
   --radius: 0.75rem;
-  /* Sidebar matches the main surface (light, white) with the accent
-     green for the active nav item — not a fixed dark brand panel. */
+  /* Sidebar matches the main surface (light, white) with the brand teal
+     for the active nav item — not a fixed dark brand panel. */
   --sidebar: #ffffff;
-  --sidebar-foreground: #4a4738;
-  --sidebar-primary: #1f5d3b;
-  --sidebar-primary-foreground: #f4f1e8;
-  --sidebar-accent: #e4ede6;
-  --sidebar-accent-foreground: #1f5d3b;
-  --sidebar-border: #e6e0d2;
-  --sidebar-ring: #1f5d3b;
+  --sidebar-foreground: #5b6560;
+  --sidebar-primary: #0b7d6c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e1f1ec;
+  --sidebar-accent-foreground: #0b7d6c;
+  --sidebar-border: #e3e0d6;
+  --sidebar-ring: #0b7d6c;
 }
 
 .dark {
-  /* Cards must visibly LIFT off the page — the first attempt at these
-     values (#131310 bg / #1b1b15 card, #322e22 border) were all within a
-     few percent lightness of each other, so every card silently blended
-     into the background with no visible seam. These are spaced further
-     apart on purpose: background darkest, card a real step up, border
-     bright enough to read against both. */
-  --background: #0f0f0c;
-  --foreground: #f0ecdf;
-  --card: #1d1d16;
-  --card-foreground: #f0ecdf;
-  --popover: #1d1d16;
-  --popover-foreground: #f0ecdf;
-  --primary: #4fa176;
-  --primary-foreground: #08130d;
-  --secondary: #262619;
-  --secondary-foreground: #f0ecdf;
-  --muted: #262619;
-  --muted-foreground: #a69f89;
-  --accent: #223326;
-  --accent-foreground: #4fa176;
-  --destructive: #e08b6e;
-  --success: #66b6a7;
-  --success-foreground: #0f211b;
-  --warning: #dbaa5a;
-  --warning-foreground: #2a2214;
-  --border: #3e3928;
-  --input: #3e3928;
-  --ring: #4fa176;
-  --brand-indigo: #4fa176;
-  --brand-blue: #66b6a7;
-  --brand-green: #66b6a7;
-  --brand-amber: #dbaa5a;
-  --brand-red: #e08b6e;
-  --chart-1: #4fa176;
-  --chart-2: #e08b6e;
-  --chart-3: #dbaa5a;
-  --chart-4: #66b6a7;
-  --chart-5: #a79f89;
-  --sidebar: #1d1d16;
-  --sidebar-foreground: #c9c2ac;
-  --sidebar-primary: #4fa176;
-  --sidebar-primary-foreground: #08130d;
-  --sidebar-accent: #223326;
-  --sidebar-accent-foreground: #4fa176;
-  --sidebar-border: #3e3928;
-  --sidebar-ring: #4fa176;
+  /* Same lift-off-the-page discipline as before: background darkest, card
+     a real step up, border bright enough to read against both — carried
+     forward from the prior dark-mode fix, just re-tinted to the new
+     palette instead of re-deriving it from scratch. */
+  --background: #121614;
+  --foreground: #eceae3;
+  --card: #191f1c;
+  --card-foreground: #eceae3;
+  --popover: #191f1c;
+  --popover-foreground: #eceae3;
+  --primary: #57c6b4;
+  --primary-foreground: #0a2420;
+  --secondary: #21261f;
+  --secondary-foreground: #eceae3;
+  --muted: #21261f;
+  --muted-foreground: #a9b0aa;
+  --accent: #16302c;
+  --accent-foreground: #57c6b4;
+  --destructive: #e38a78;
+  --success: #4fcb86;
+  --success-foreground: #0f2a1a;
+  --warning: #e3b056;
+  --warning-foreground: #2e2410;
+  --border: #2a322d;
+  --input: #2a322d;
+  --ring: #57c6b4;
+  --brand-indigo: #57c6b4;
+  --brand-blue: #4fa6b8;
+  --brand-green: #4fcb86;
+  --brand-amber: #e3b056;
+  --brand-red: #e38a78;
+  --chart-1: #57c6b4;
+  --chart-2: #e38a78;
+  --chart-3: #e3b056;
+  --chart-4: #4fcb86;
+  --chart-5: #6d766f;
+  --sidebar: #191f1c;
+  --sidebar-foreground: #a9b0aa;
+  --sidebar-primary: #57c6b4;
+  --sidebar-primary-foreground: #0a2420;
+  --sidebar-accent: #16302c;
+  --sidebar-accent-foreground: #57c6b4;
+  --sidebar-border: #2a322d;
+  --sidebar-ring: #57c6b4;
 }
 
 @layer base {
