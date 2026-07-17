@@ -6,13 +6,6 @@ import { getSchoolProfile } from "@/lib/school/queries";
 import { getFeeReceipt } from "@/lib/fees/queries";
 import { amountInWords } from "@/lib/numbers/amount-in-words";
 
-// ImageResponse's default font falls back to a runtime fetch to Google
-// Fonts, which isn't reliable inside a serverless function (this was the
-// actual cause of a silent 500 on every receipt share). Bundling the font
-// locally removes that network dependency entirely.
-const fontRegular = readFile(join(process.cwd(), "src/assets/fonts/Roboto-Regular.woff"));
-const fontBold = readFile(join(process.cwd(), "src/assets/fonts/Roboto-Bold.woff"));
-
 const PAYMENT_MODE_LABEL: Record<string, string> = {
   cash: "Cash",
   bank: "Bank Transfer",
@@ -66,6 +59,38 @@ export async function GET(
   const totalCollected = receipt.amount + receipt.fineAmount;
   const particulars = receipt.periodLabel ? `School Fee — ${receipt.periodLabel}` : "School Fee";
 
+  let fontRegular: Buffer;
+  let fontBold: Buffer;
+  try {
+    [fontRegular, fontBold] = await Promise.all([
+      readFile(join(process.cwd(), "src/assets/fonts/Roboto-Regular.woff")),
+      readFile(join(process.cwd(), "src/assets/fonts/Roboto-Bold.woff")),
+    ]);
+  } catch (err) {
+    return Response.json(
+      { stage: "font-read", error: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
+
+  try {
+    return buildImage(school, receipt, totalCollected, particulars, fontRegular, fontBold);
+  } catch (err) {
+    return Response.json(
+      { stage: "image-render", error: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
+}
+
+function buildImage(
+  school: NonNullable<Awaited<ReturnType<typeof getSchoolProfile>>>,
+  receipt: NonNullable<Awaited<ReturnType<typeof getFeeReceipt>>>,
+  totalCollected: number,
+  particulars: string,
+  fontRegular: Buffer,
+  fontBold: Buffer
+) {
   return new ImageResponse(
     (
       <div
@@ -274,8 +299,8 @@ export async function GET(
       width: 900,
       height: 1180,
       fonts: [
-        { name: "Roboto", data: await fontRegular, weight: 400, style: "normal" },
-        { name: "Roboto", data: await fontBold, weight: 700, style: "normal" },
+        { name: "Roboto", data: fontRegular, weight: 400, style: "normal" },
+        { name: "Roboto", data: fontBold, weight: 700, style: "normal" },
       ],
     }
   );
