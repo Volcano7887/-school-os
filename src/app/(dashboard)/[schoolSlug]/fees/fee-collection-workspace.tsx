@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FilterBar } from "@/components/shared/filter-bar";
 import { SendReminderDropdown } from "./send-reminder-dropdown";
 import { FeeCollectionPanel } from "./fee-collection-panel";
 import type { StudentBalance } from "@/lib/fees/queries";
@@ -61,22 +60,29 @@ export function FeeCollectionWorkspace({
   search: string;
   classId: string;
 }) {
-  const [quickSearch, setQuickSearch] = useState("");
+  // One search box drives the visible list live (client-side — the full
+  // roster for the current class filter is already loaded, no reload
+  // needed), instead of a separate autocomplete popup duplicating a second
+  // "search by name" box right below it. Seeded from the URL so a shared
+  // link still opens pre-filtered.
+  const [quickSearch, setQuickSearch] = useState(search);
+  const [classFilter, setClassFilter] = useState(classId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const suggestions = useMemo(() => {
+  const filteredStudents = useMemo(() => {
     const q = quickSearch.trim().toLowerCase();
-    if (!q) return [];
-    return students
-      .filter(
-        (s) =>
-          s.fullName.toLowerCase().includes(q) ||
-          s.admissionNo?.toLowerCase().includes(q) ||
-          s.guardianPhone?.includes(q)
-      )
-      .slice(0, 8);
-  }, [quickSearch, students]);
+    const className = classes.find((c) => c.id === classFilter)?.name;
+    return students.filter((s) => {
+      if (className && s.className !== className) return false;
+      if (!q) return true;
+      return (
+        s.fullName.toLowerCase().includes(q) ||
+        s.admissionNo?.toLowerCase().includes(q) ||
+        s.guardianPhone?.includes(q)
+      );
+    });
+  }, [quickSearch, classFilter, classes, students]);
 
   const selected = students.find((s) => s.studentId === selectedId) ?? null;
 
@@ -90,35 +96,30 @@ export function FeeCollectionWorkspace({
 
   return (
     <div className="space-y-4">
-      {/* Search-first entry point, matching the reference */}
-      <div className="relative max-w-md">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={quickSearch}
-          onChange={(e) => setQuickSearch(e.target.value)}
-          placeholder="Search student by name, admission no. or phone…"
-          className="pl-9"
-        />
-        {suggestions.length > 0 && (
-          <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover shadow-md">
-            {suggestions.map((s) => (
-              <button
-                key={s.studentId}
-                type="button"
-                onClick={() => selectStudent(s.studentId)}
-                className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-muted"
-              >
-                <span>
-                  {s.fullName}{" "}
-                  <span className="text-muted-foreground">({s.className ?? "No class"})</span>
-                </span>
-                {s.balance > 0 && (
-                  <span className="text-xs text-destructive">{inr(s.balance)} due</span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
+      {/* One search box, live client-side — types straight into the list
+          below instead of a separate popup duplicating it. */}
+      <div className="flex flex-wrap gap-2">
+        <div className="relative max-w-xs flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={quickSearch}
+            onChange={(e) => setQuickSearch(e.target.value)}
+            placeholder="Search by name, admission no. or phone…"
+            className="pl-9"
+          />
+        </div>
+        <select
+          value={classFilter}
+          onChange={(e) => setClassFilter(e.target.value)}
+          className="h-9 rounded-md border bg-background px-3 text-sm"
+        >
+          <option value="">All classes</option>
+          {classes.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {selected && (
@@ -133,14 +134,11 @@ export function FeeCollectionWorkspace({
       )}
 
       <div className="space-y-3 pt-2">
-        <h2 className="text-sm font-medium text-muted-foreground">All students</h2>
-        <FilterBar classes={classes} search={search} classId={classId} />
-
-        {students.length === 0 ? (
+        {filteredStudents.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-10 text-center">
             <Wallet className="size-8 text-muted-foreground" />
             <p className="font-medium">
-              {search || classId ? "No students match your search" : "No students yet"}
+              {quickSearch || classFilter ? "No students match your search" : "No students yet"}
             </p>
           </div>
         ) : (
@@ -159,7 +157,7 @@ export function FeeCollectionWorkspace({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {students.map((s) => {
+                  {filteredStudents.map((s) => {
                     const status = statusFor(s.totalDue, s.totalPaid, s.balance);
                     return (
                       <TableRow key={s.studentId}>
@@ -203,7 +201,7 @@ export function FeeCollectionWorkspace({
                 every row a full-width Collect button, which made the list
                 read as a wall of buttons instead of a list of students. */}
             <div className="space-y-2 sm:hidden">
-              {students.map((s) => {
+              {filteredStudents.map((s) => {
                 const status = statusFor(s.totalDue, s.totalPaid, s.balance);
                 return (
                   <div key={s.studentId} className="rounded-xl border bg-card p-3">
