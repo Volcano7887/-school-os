@@ -317,6 +317,7 @@ export type Database = {
           journal_entry_id: string | null;
           discount_amount: number;
           fine_amount: number;
+          fee_type: FeeType;
           created_at: string;
         };
         Insert: {
@@ -335,6 +336,7 @@ export type Database = {
           journal_entry_id?: string | null;
           discount_amount?: number;
           fine_amount?: number;
+          fee_type: FeeType;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["fee_payments"]["Insert"]>;
