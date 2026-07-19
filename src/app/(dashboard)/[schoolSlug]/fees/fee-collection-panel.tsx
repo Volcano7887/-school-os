@@ -134,7 +134,7 @@ export function FeeCollectionPanel({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="tuition">Tuition</SelectItem>
+                    <SelectItem value="tuition">Monthly Fee</SelectItem>
                     <SelectItem value="admission">Admission</SelectItem>
                     <SelectItem value="exam">Exam</SelectItem>
                     <SelectItem value="arrears">Arrears</SelectItem>

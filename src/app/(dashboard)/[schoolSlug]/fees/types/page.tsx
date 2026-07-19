@@ -5,9 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 const FEE_TYPES = [
   {
     type: "tuition",
-    label: "Tuition",
+    label: "Monthly Fee",
     code: "4000",
-    description: "Regular recurring tuition/school fee.",
+    description: "Regular recurring monthly school fee.",
   },
   {
     type: "admission",

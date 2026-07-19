@@ -24,7 +24,7 @@ import type { FeeStructure } from "@/lib/fees/queries";
 import type { SchoolClass } from "@/lib/students/queries";
 
 const FEE_TYPE_LABEL: Record<string, string> = {
-  tuition: "Tuition",
+  tuition: "Monthly Fee",
   admission: "Admission",
   exam: "Exam",
   arrears: "Arrears",
@@ -87,7 +87,7 @@ export function FeeStructureDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tuition">Tuition</SelectItem>
+                  <SelectItem value="tuition">Monthly Fee</SelectItem>
                   <SelectItem value="admission">Admission</SelectItem>
                   <SelectItem value="exam">Exam</SelectItem>
                   <SelectItem value="arrears">Arrears</SelectItem>
@@ -114,7 +114,7 @@ export function FeeStructureDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" placeholder="e.g. Monthly Tuition" required />
+              <Input id="name" name="name" placeholder="e.g. Monthly Fee" required />
               {state.fieldErrors?.name && (
                 <p className="text-sm text-destructive">{state.fieldErrors.name[0]}</p>
               )}
