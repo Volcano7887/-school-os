@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getMonthlyIncomeExpense } from "@/lib/dashboard/queries";
 import { getExpenseByCategoryLast12Months } from "@/lib/reports/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IncomeExpenseChart } from "@/components/shared/income-expense-chart";
 import { ExpenseCategoryDonut } from "@/components/shared/expense-category-donut";
@@ -38,12 +37,6 @@ export default async function AnalyticsPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Analytics" },
-        ]}
-      />
       <div>
         <h1 className="text-xl font-semibold">Analytics</h1>
         <p className="text-sm text-muted-foreground">

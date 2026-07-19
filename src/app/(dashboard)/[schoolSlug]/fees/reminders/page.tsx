@@ -4,7 +4,6 @@ import { getSchoolIdBySlug, getSchoolProfile } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
 import { getStudentBalances } from "@/lib/fees/queries";
 import { getClasses } from "@/lib/students/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { FilterBar } from "@/components/shared/filter-bar";
 import { SendReminderDropdown } from "../send-reminder-dropdown";
 
@@ -40,13 +39,6 @@ export default async function FeesReminderPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fees", href: `/${schoolSlug}/fees` },
-          { label: "Fees Reminder" },
-        ]}
-      />
       <div>
         <h1 className="text-xl font-semibold">Fees Reminder</h1>
         <p className="text-sm text-muted-foreground">

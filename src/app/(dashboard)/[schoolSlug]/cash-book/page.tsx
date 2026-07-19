@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getCashBookEntries, type CashBookEntry } from "@/lib/accounting/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -113,12 +112,6 @@ export default async function CashBookPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Cash Book" },
-        ]}
-      />
       <h1 className="text-xl font-semibold">Cash Book</h1>
 
       <Tabs defaultValue="cash">

@@ -7,7 +7,6 @@ import {
   getDailyIncomeExpenseThisMonth,
   getExpenseByCategoryThisMonth,
 } from "@/lib/reports/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DailyIncomeExpenseBar } from "@/components/shared/daily-income-expense-bar";
 import { ExpenseCategoryDonut } from "@/components/shared/expense-category-donut";
@@ -77,12 +76,6 @@ export default async function ReportsPage({
 
   return (
     <div className="space-y-6">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Reports" },
-        ]}
-      />
       <h1 className="text-xl font-semibold">Reports</h1>
 
       {/* Quick shortcuts — real navigation to the relevant section/page below,

@@ -3,7 +3,6 @@ import { getSchoolIdBySlug, getSchoolProfile } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
 import { getClasses } from "@/lib/students/queries";
 import { getFeeStructures, getStudentBalances, searchFeePayments } from "@/lib/fees/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { AcademicYearSetup } from "./academic-year-setup";
 import { FeeStructureDialog } from "./fee-structure-dialog";
 import { FeeCollectionWorkspace } from "./fee-collection-workspace";
@@ -49,12 +48,6 @@ export default async function FeesPage({
   if (!academicYear) {
     return (
       <div className="space-y-4">
-        <Breadcrumb
-          items={[
-            { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-            { label: "Fees" },
-          ]}
-        />
         <h1 className="text-xl font-semibold">Fees</h1>
         <AcademicYearSetup schoolSlug={schoolSlug} />
       </div>
@@ -82,13 +75,6 @@ export default async function FeesPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fees" },
-        ]}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Fees</h1>

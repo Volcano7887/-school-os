@@ -2,7 +2,6 @@ import { History, Wallet, Receipt, Banknote } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getAuditLog, type AuditLogEntry } from "@/lib/audit-log/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 
 const ENTRY_STYLE: Record<string, { icon: typeof Wallet; className: string }> = {
   "Fee Payment": {
@@ -70,12 +69,6 @@ export default async function AuditLogPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Audit Log" },
-        ]}
-      />
       <div>
         <h1 className="text-xl font-semibold">Activity</h1>
         <p className="text-sm text-muted-foreground">

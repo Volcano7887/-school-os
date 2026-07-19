@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getCurrentAcademicYear, getPreviousAcademicYear } from "@/lib/academic-years/queries";
 import { getCarryForwardCandidates } from "@/lib/fees/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import {
   Table,
   TableBody,
@@ -33,13 +32,6 @@ export default async function FeesCarryForwardPage({
   if (!currentYear) {
     return (
       <div className="space-y-4">
-        <Breadcrumb
-          items={[
-            { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-            { label: "Fees", href: `/${schoolSlug}/fees` },
-            { label: "Fees Carry Forward" },
-          ]}
-        />
         <h1 className="text-xl font-semibold">Fees Carry Forward</h1>
         <p className="text-sm text-muted-foreground">
           Set up an academic year first (via Fee Collection) before carrying
@@ -57,13 +49,6 @@ export default async function FeesCarryForwardPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fees", href: `/${schoolSlug}/fees` },
-          { label: "Fees Carry Forward" },
-        ]}
-      />
       <div>
         <h1 className="text-xl font-semibold">Fees Carry Forward</h1>
         <p className="text-sm text-muted-foreground">

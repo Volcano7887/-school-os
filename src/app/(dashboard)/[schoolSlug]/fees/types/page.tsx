@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 
 const FEE_TYPES = [
@@ -53,13 +52,6 @@ export default async function FeeTypesPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fees", href: `/${schoolSlug}/fees` },
-          { label: "Fees Type" },
-        ]}
-      />
       <div>
         <h1 className="text-xl font-semibold">Fees Type</h1>
         <p className="text-sm text-muted-foreground">

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug, getSchoolProfile, getSchoolMembers, getUserRole } from "@/lib/school/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { SettingsForm } from "./settings-form";
 import { MembersSection } from "./members-section";
 
@@ -28,12 +27,6 @@ export default async function SettingsPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Settings" },
-        ]}
-      />
       <h1 className="text-xl font-semibold">Settings</h1>
       <SettingsForm schoolSlug={schoolSlug} school={school} />
       {isAdmin && user && (

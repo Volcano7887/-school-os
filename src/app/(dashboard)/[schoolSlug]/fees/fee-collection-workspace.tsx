@@ -121,20 +121,16 @@ export function FeeCollectionWorkspace({
         )}
       </div>
 
-      <div ref={panelRef} className="scroll-mt-4">
-        {selected ? (
+      {selected && (
+        <div ref={panelRef} className="scroll-mt-4">
           <FeeCollectionPanel
             key={selected.studentId}
             schoolSlug={schoolSlug}
             student={selected}
             onDone={() => setSelectedId(null)}
           />
-        ) : (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            Search for a student above, or pick one from the list below, to record a payment.
-          </p>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="space-y-3 pt-2">
         <h2 className="text-sm font-medium text-muted-foreground">All students</h2>

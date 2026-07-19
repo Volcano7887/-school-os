@@ -2,7 +2,6 @@ import { GraduationCap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getClassesWithCounts } from "@/lib/students/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { AddClassDialog, RenameClassDialog } from "./class-dialog";
 
@@ -20,13 +19,6 @@ export default async function ClassesPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Classes" },
-        ]}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Classes</h1>

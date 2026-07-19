@@ -2,7 +2,6 @@ import { Receipt, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getExpenseCategories, getVendors, getExpenses } from "@/lib/expenses/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { ManageCategoriesDialog } from "./manage-categories-dialog";
 import { ManageVendorsDialog } from "./manage-vendors-dialog";
@@ -33,13 +32,6 @@ export default async function ExpensesPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Expenses" },
-        ]}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Expenses</h1>

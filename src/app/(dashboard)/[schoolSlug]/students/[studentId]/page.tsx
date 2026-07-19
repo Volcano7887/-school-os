@@ -6,7 +6,6 @@ import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getClasses, getStudent } from "@/lib/students/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
 import { getStudentPayments, getStudentBalances } from "@/lib/fees/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -82,14 +81,6 @@ export default async function StudentProfilePage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Students", href: `/${schoolSlug}/students` },
-          { label: student.full_name },
-        ]}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border bg-card p-4">
         <div className="flex items-center gap-4">
           <Avatar size="lg">

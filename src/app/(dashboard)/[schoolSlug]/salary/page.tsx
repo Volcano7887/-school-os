@@ -2,7 +2,6 @@ import { UserPlus, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getStaffWithCurrentMonthStatus } from "@/lib/salary/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -48,13 +47,6 @@ export default async function SalaryPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Salary" },
-        ]}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Salary</h1>

@@ -2,7 +2,6 @@ import { Paperclip, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getExpenseBills } from "@/lib/expenses/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import {
   Table,
   TableBody,
@@ -38,12 +37,6 @@ export default async function BillsPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Bills" },
-        ]}
-      />
       <div>
         <h1 className="text-xl font-semibold">Bills</h1>
         <p className="text-sm text-muted-foreground">

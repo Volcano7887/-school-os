@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getLedgerAccounts, getAccountLedger } from "@/lib/accounting/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import {
   Table,
   TableBody,
@@ -56,13 +55,6 @@ export default async function LedgerPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Ledger" },
-        ]}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Ledger</h1>
         {account && (

@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
 import { getDiscountedPayments } from "@/lib/fees/queries";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import {
   Table,
   TableBody,
@@ -44,13 +43,6 @@ export default async function FeesDiscountPage({
 
   return (
     <div className="space-y-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: `/${schoolSlug}/dashboard` },
-          { label: "Fees", href: `/${schoolSlug}/fees` },
-          { label: "Fees Discount" },
-        ]}
-      />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Fees Discount</h1>
