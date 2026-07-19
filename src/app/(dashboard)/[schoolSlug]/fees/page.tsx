@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Table2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSchoolIdBySlug, getSchoolProfile } from "@/lib/school/queries";
 import { getCurrentAcademicYear } from "@/lib/academic-years/queries";
@@ -80,7 +82,16 @@ export default async function FeesPage({
           <h1 className="text-xl font-semibold">Fees</h1>
           <p className="text-sm text-muted-foreground">Academic year {academicYear.name}</p>
         </div>
-        <FeeStructureDialog schoolSlug={schoolSlug} structures={structures} classes={classes} />
+        <div className="flex gap-2">
+          <Link
+            href={`/${schoolSlug}/fees/register`}
+            className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <Table2 className="size-4" />
+            Fee Register
+          </Link>
+          <FeeStructureDialog schoolSlug={schoolSlug} structures={structures} classes={classes} />
+        </div>
       </div>
 
       {structures.length === 0 && (
