@@ -58,26 +58,28 @@
 }
 
 :root {
-  /* School OS redesign, locked 2026-07-18 (Dashboard + Fee Collection).
-     Deep teal as the one brand accent — deliberately not the fintech-blue
-     or purple every other SaaS dashboard reaches for — kept out of the
-     income/expense semantic family so data color never doubles as brand
-     color. Warm paper background, not stark white. Supersedes the prior
-     "Trusted Ledger" values (architecture kept, palette replaced). */
+  /* Repainted 2026-07-18: the deep teal read as too dark/muted, not
+     "attention seeking" — direct user feedback after living with it on a
+     real phone, not a stylistic dispute. Replaced with a vivid, confident
+     blue — kept out of the income/expense/warning semantic family so data
+     color never doubles as brand color, and blue is the single most
+     broadly-trusted hue for financial software (including in India, where
+     most banking/fintech apps already lean blue). Warm paper background
+     unchanged. */
   --background: #f6f5f0;
   --foreground: #1b211f;
   --card: #ffffff;
   --card-foreground: #1b211f;
   --popover: #ffffff;
   --popover-foreground: #1b211f;
-  --primary: #0b7d6c;
+  --primary: #2563eb;
   --primary-foreground: #ffffff;
   --secondary: #eeece4;
   --secondary-foreground: #1b211f;
   --muted: #eeece4;
   --muted-foreground: #8b958f;
-  --accent: #e1f1ec;
-  --accent-foreground: #0b7d6c;
+  --accent: #e2ebfe;
+  --accent-foreground: #2563eb;
   --destructive: #ae3b2e;
   --success: #1e7a4c;
   --success-foreground: #ffffff;
@@ -85,49 +87,48 @@
   --warning-foreground: #ffffff;
   --border: #e3e0d6;
   --input: #e3e0d6;
-  --ring: #0b7d6c;
-  --brand-indigo: #0b7d6c;
-  --brand-blue: #2f7a8c;
+  --ring: #2563eb;
+  --brand-indigo: #2563eb;
+  --brand-blue: #7c3aed;
   --brand-green: #1e7a4c;
   --brand-amber: #93650f;
   --brand-red: #ae3b2e;
-  --chart-1: #0b7d6c;
+  --chart-1: #2563eb;
   --chart-2: #ae3b2e;
   --chart-3: #93650f;
   --chart-4: #1e7a4c;
-  --chart-5: #8b958f;
+  --chart-5: #7c3aed;
   --radius: 0.75rem;
-  /* Sidebar matches the main surface (light, white) with the brand teal
+  /* Sidebar matches the main surface (light, white) with the brand blue
      for the active nav item — not a fixed dark brand panel. */
   --sidebar: #ffffff;
   --sidebar-foreground: #5b6560;
-  --sidebar-primary: #0b7d6c;
+  --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e1f1ec;
-  --sidebar-accent-foreground: #0b7d6c;
+  --sidebar-accent: #e2ebfe;
+  --sidebar-accent-foreground: #2563eb;
   --sidebar-border: #e3e0d6;
-  --sidebar-ring: #0b7d6c;
+  --sidebar-ring: #2563eb;
 }
 
 .dark {
   /* Same lift-off-the-page discipline as before: background darkest, card
      a real step up, border bright enough to read against both — carried
-     forward from the prior dark-mode fix, just re-tinted to the new
-     palette instead of re-deriving it from scratch. */
+     forward from the prior dark-mode fix, just re-tinted to the new blue. */
   --background: #121614;
   --foreground: #eceae3;
   --card: #191f1c;
   --card-foreground: #eceae3;
   --popover: #191f1c;
   --popover-foreground: #eceae3;
-  --primary: #57c6b4;
-  --primary-foreground: #0a2420;
+  --primary: #5e93ff;
+  --primary-foreground: #0a1a3a;
   --secondary: #21261f;
   --secondary-foreground: #eceae3;
   --muted: #21261f;
   --muted-foreground: #a9b0aa;
-  --accent: #16302c;
-  --accent-foreground: #57c6b4;
+  --accent: #17233d;
+  --accent-foreground: #5e93ff;
   --destructive: #e38a78;
   --success: #4fcb86;
   --success-foreground: #0f2a1a;
@@ -135,25 +136,25 @@
   --warning-foreground: #2e2410;
   --border: #2a322d;
   --input: #2a322d;
-  --ring: #57c6b4;
-  --brand-indigo: #57c6b4;
-  --brand-blue: #4fa6b8;
+  --ring: #5e93ff;
+  --brand-indigo: #5e93ff;
+  --brand-blue: #a78bfa;
   --brand-green: #4fcb86;
   --brand-amber: #e3b056;
   --brand-red: #e38a78;
-  --chart-1: #57c6b4;
+  --chart-1: #5e93ff;
   --chart-2: #e38a78;
   --chart-3: #e3b056;
   --chart-4: #4fcb86;
-  --chart-5: #6d766f;
+  --chart-5: #a78bfa;
   --sidebar: #191f1c;
   --sidebar-foreground: #a9b0aa;
-  --sidebar-primary: #57c6b4;
-  --sidebar-primary-foreground: #0a2420;
-  --sidebar-accent: #16302c;
-  --sidebar-accent-foreground: #57c6b4;
+  --sidebar-primary: #5e93ff;
+  --sidebar-primary-foreground: #0a1a3a;
+  --sidebar-accent: #17233d;
+  --sidebar-accent-foreground: #5e93ff;
   --sidebar-border: #2a322d;
-  --sidebar-ring: #57c6b4;
+  --sidebar-ring: #5e93ff;
 }
 
 @layer base {
